@@ -1,0 +1,83 @@
+{
+  "nav": {
+    "blog": "Blog",
+    "admin": "Admin"
+  },
+  "hero": {
+    "role": "Fullstack Engineer & Creator",
+    "bio": "I build modern web products with a strong focus on design and user experience. Passionate about clean code and elegant interfaces.",
+    "contact": "Get in touch"
+  },
+  "done": {
+    "title": "Things I've done"
+  },
+  "built": {
+    "title": "Things I've built",
+    "viewProject": "View project",
+    "viewCode": "Source code"
+  },
+  "tech": {
+    "title": "Tech I love",
+    "frontend": "Frontend",
+    "backend": "Backend",
+    "devops": "DevOps",
+    "tools": "Tools"
+  },
+  "contact": {
+    "title": "Get in touch",
+    "subtitle": "I'm always open to new opportunities and collaborations.",
+    "email": "Send me an email",
+    "form": {
+      "name": "Your name",
+      "email": "Your email",
+      "message": "Your message",
+      "send": "Send",
+      "success": "Message sent successfully!",
+      "error": "An error occurred. Please try again."
+    }
+  },
+  "footer": {
+    "formations": "Courses & Articles",
+    "products": "Products",
+    "copyright": "All rights reserved.",
+    "legal": "Legal notice",
+    "privacy": "Privacy policy"
+  },
+  "admin": {
+    "login": {
+      "title": "Admin Login",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "error": "Invalid credentials"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "projects": "Projects",
+      "accomplishments": "Accomplishments",
+      "messages": "Messages",
+      "social": "Social links",
+      "settings": "Settings",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "edit": "Edit",
+      "delete": "Delete",
+      "add": "Add",
+      "save": "Save",
+      "cancel": "Cancel",
+      "success": "Saved successfully",
+      "error": "An error occurred"
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "My articles and thoughts on web development.",
+    "readMore": "Read more",
+    "empty": "No articles yet."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "subtitle": "The page you're looking for doesn't exist.",
+    "back": "Back to home"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "nav": {
+    "blog": "Blog",
+    "admin": "Admin"
+  },
+  "hero": {
+    "role": "Développeur Fullstack & Créateur",
+    "bio": "Je construis des produits web modernes avec une attention particulière au design et à l'expérience utilisateur. Passionné par le code propre et les interfaces élégantes.",
+    "contact": "Me contacter"
+  },
+  "done": {
+    "title": "Ce que j'ai accompli"
+  },
+  "built": {
+    "title": "Ce que j'ai construit",
+    "viewProject": "Voir le projet",
+    "viewCode": "Code source"
+  },
+  "tech": {
+    "title": "Tech que j'aime",
+    "frontend": "Frontend",
+    "backend": "Backend",
+    "devops": "DevOps",
+    "tools": "Outils"
+  },
+  "contact": {
+    "title": "Parlons-en",
+    "subtitle": "Je suis toujours ouvert à de nouvelles opportunités et collaborations.",
+    "email": "M'écrire un email",
+    "form": {
+      "name": "Votre nom",
+      "email": "Votre email",
+      "message": "Votre message",
+      "send": "Envoyer",
+      "success": "Message envoyé avec succès !",
+      "error": "Une erreur est survenue. Réessayez."
+    }
+  },
+  "footer": {
+    "formations": "Formations & Articles",
+    "products": "Produits",
+    "copyright": "Tous droits réservés.",
+    "legal": "Mentions légales",
+    "privacy": "Confidentialité"
+  },
+  "admin": {
+    "login": {
+      "title": "Connexion Admin",
+      "email": "Email",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "error": "Identifiants incorrects"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "projects": "Projets",
+      "accomplishments": "Accomplissements",
+      "messages": "Messages",
+      "social": "Réseaux sociaux",
+      "settings": "Paramètres",
+      "publish": "Publier",
+      "unpublish": "Dépublier",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "add": "Ajouter",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "success": "Sauvegardé avec succès",
+      "error": "Une erreur est survenue"
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Mes articles et réflexions sur le développement web.",
+    "readMore": "Lire la suite",
+    "empty": "Aucun article pour l'instant."
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "subtitle": "La page que vous cherchez n'existe pas.",
+    "back": "Retour à l'accueil"
+  }
+}

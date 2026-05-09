@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  titleFr     String
+  titleEn     String
+  titleIt     String
+  descFr      String
+  descEn      String
+  descIt      String
+  url         String?
+  github      String?
+  tags        String   @default("[]")
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Accomplishment {
+  id        String   @id @default(cuid())
+  textFr    String
+  textEn    String
+  textIt    String
+  link      String?
+  linkLabel String?
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SocialLink {
+  id        String   @id @default(cuid())
+  platform  String
+  url       String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id         String   @id @default(cuid())
+  nameFr     String   @default("")
+  nameEn     String   @default("")
+  nameIt     String   @default("")
+  roleFr     String   @default("")
+  roleEn     String   @default("")
+  roleIt     String   @default("")
+  bioFr      String   @default("")
+  bioEn      String   @default("")
+  bioIt      String   @default("")
+  email      String   @default("")
+  photoUrl   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

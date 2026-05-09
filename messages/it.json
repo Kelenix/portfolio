@@ -1,0 +1,83 @@
+{
+  "nav": {
+    "blog": "Blog",
+    "admin": "Admin"
+  },
+  "hero": {
+    "role": "Ingegnere Fullstack & Creatore",
+    "bio": "Costruisco prodotti web moderni con grande attenzione al design e all'esperienza utente. Appassionato di codice pulito e interfacce eleganti.",
+    "contact": "Contattami"
+  },
+  "done": {
+    "title": "Cosa ho realizzato"
+  },
+  "built": {
+    "title": "Cosa ho costruito",
+    "viewProject": "Vedi progetto",
+    "viewCode": "Codice sorgente"
+  },
+  "tech": {
+    "title": "Tech che amo",
+    "frontend": "Frontend",
+    "backend": "Backend",
+    "devops": "DevOps",
+    "tools": "Strumenti"
+  },
+  "contact": {
+    "title": "Parliamoci",
+    "subtitle": "Sono sempre aperto a nuove opportunità e collaborazioni.",
+    "email": "Scrivimi un'email",
+    "form": {
+      "name": "Il tuo nome",
+      "email": "La tua email",
+      "message": "Il tuo messaggio",
+      "send": "Invia",
+      "success": "Messaggio inviato con successo!",
+      "error": "Si è verificato un errore. Riprova."
+    }
+  },
+  "footer": {
+    "formations": "Corsi & Articoli",
+    "products": "Prodotti",
+    "copyright": "Tutti i diritti riservati.",
+    "legal": "Note legali",
+    "privacy": "Privacy policy"
+  },
+  "admin": {
+    "login": {
+      "title": "Accesso Admin",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Accedi",
+      "error": "Credenziali non valide"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "projects": "Progetti",
+      "accomplishments": "Realizzazioni",
+      "messages": "Messaggi",
+      "social": "Social link",
+      "settings": "Impostazioni",
+      "publish": "Pubblica",
+      "unpublish": "Rimuovi",
+      "edit": "Modifica",
+      "delete": "Elimina",
+      "add": "Aggiungi",
+      "save": "Salva",
+      "cancel": "Annulla",
+      "success": "Salvato con successo",
+      "error": "Si è verificato un errore"
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "I miei articoli e riflessioni sullo sviluppo web.",
+    "readMore": "Leggi di più",
+    "empty": "Nessun articolo per ora."
+  },
+  "notFound": {
+    "title": "Pagina non trovata",
+    "subtitle": "La pagina che stai cercando non esiste.",
+    "back": "Torna alla home"
+  }
+}
