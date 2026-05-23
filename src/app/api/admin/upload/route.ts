@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 
 const BUCKET = "avatars";
 
@@ -15,6 +15,8 @@ export async function POST(req: NextRequest) {
   const ext = file.name.split(".").pop() ?? "jpg";
   const path = `avatar.${ext}`;
   const bytes = await file.arrayBuffer();
+
+  const supabase = getSupabaseClient();
 
   const { error } = await supabase.storage
     .from(BUCKET)
