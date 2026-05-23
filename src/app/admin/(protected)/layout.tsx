@@ -5,6 +5,8 @@ import { ToastContainer } from "@/components/admin/Toast";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: { template: "%s | Admin", default: "Admin" },
   robots: { index: false, follow: false },
