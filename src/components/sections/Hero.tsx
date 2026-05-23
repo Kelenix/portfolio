@@ -52,7 +52,7 @@ export function Hero({ profile }: { profile: ProfileData }) {
             style={{ border: "2px solid var(--border)" }}
           >
             {profile.photoUrl ? (
-              <Image src={profile.photoUrl} alt={profile.name} fill className="object-cover" />
+              <Image src={profile.photoUrl} alt={profile.name} fill sizes="64px" className="object-cover" />
             ) : (
               <div
                 className="w-full h-full flex items-center justify-center text-xl font-mono font-bold"

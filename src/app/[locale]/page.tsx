@@ -23,7 +23,7 @@ export default async function HomePage() {
   const isEn = locale === "en";
   const isIt = locale === "it";
 
-  const [profile, socials, accomplishments, projects] = await Promise.all([
+  const [profile, socials, accomplishments, projects, skills] = await Promise.all([
     prisma.profile.findFirst({ where: { id: "default" } }),
     prisma.socialLink.findMany({ orderBy: { order: "asc" } }),
     prisma.accomplishment.findMany({
@@ -33,6 +33,10 @@ export default async function HomePage() {
     prisma.project.findMany({
       where: { published: true },
       orderBy: { order: "asc" },
+    }),
+    prisma.skill.findMany({
+      where: { published: true },
+      orderBy: [{ category: "asc" }, { order: "asc" }],
     }),
   ]);
 
@@ -78,7 +82,7 @@ export default async function HomePage() {
       <Hero profile={profileData} />
       <Accomplishments items={accomplishmentItems} />
       <Projects items={projectItems} />
-      <TechStack />
+      <TechStack skills={skills} />
       <Contact email={profileData.email} />
     </>
   );

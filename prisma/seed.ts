@@ -133,6 +133,39 @@ async function main() {
     });
   }
 
+  const skills = [
+    // Frontend
+    { id: "skill-react", name: "React", iconName: "SiReact", category: "frontend", order: 1 },
+    { id: "skill-nextjs", name: "Next.js", iconName: "SiNextdotjs", category: "frontend", order: 2 },
+    { id: "skill-typescript", name: "TypeScript", iconName: "SiTypescript", category: "frontend", order: 3 },
+    { id: "skill-tailwind", name: "Tailwind CSS", iconName: "SiTailwindcss", category: "frontend", order: 4 },
+    { id: "skill-framer", name: "Framer Motion", iconName: "SiFramer", category: "frontend", order: 5 },
+    // Backend
+    { id: "skill-nodejs", name: "Node.js", iconName: "SiNodedotjs", category: "backend", order: 1 },
+    { id: "skill-prisma", name: "Prisma", iconName: "SiPrisma", category: "backend", order: 2 },
+    { id: "skill-postgresql", name: "PostgreSQL", iconName: "SiPostgresql", category: "backend", order: 3 },
+    { id: "skill-sqlite", name: "SQLite", iconName: "SiSqlite", category: "backend", order: 4 },
+    { id: "skill-graphql", name: "GraphQL", iconName: "SiGraphql", category: "backend", order: 5 },
+    // DevOps
+    { id: "skill-vercel", name: "Vercel", iconName: "SiVercel", category: "devops", order: 1 },
+    { id: "skill-docker", name: "Docker", iconName: "SiDocker", category: "devops", order: 2 },
+    { id: "skill-ghactions", name: "GitHub Actions", iconName: "SiGithubactions", category: "devops", order: 3 },
+    { id: "skill-git", name: "Git", iconName: "SiGit", category: "devops", order: 4 },
+    // Tools
+    { id: "skill-vscode", name: "VS Code", iconName: "TbBrandVscode", category: "tools", order: 1 },
+    { id: "skill-figma", name: "Figma", iconName: "SiFigma", category: "tools", order: 2 },
+    { id: "skill-postman", name: "Postman", iconName: "SiPostman", category: "tools", order: 3 },
+    { id: "skill-api", name: "REST API", iconName: "TbApi", category: "tools", order: 4 },
+  ];
+
+  for (const skill of skills) {
+    await prisma.skill.upsert({
+      where: { id: skill.id },
+      update: {},
+      create: skill,
+    });
+  }
+
   console.log("✅ Database seeded successfully");
 }
 

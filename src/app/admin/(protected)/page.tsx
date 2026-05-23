@@ -1,16 +1,18 @@
 import { prisma } from "@/lib/db";
-import { FolderOpen, Star, MessageSquare, Share2 } from "lucide-react";
+import { FolderOpen, Star, MessageSquare, Code2, BookOpen } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
 export default async function AdminDashboard() {
-  const [projectCount, accomplishmentCount, messageCount, unreadCount] =
+  const [projectCount, accomplishmentCount, messageCount, unreadCount, skillCount, blogCount] =
     await Promise.all([
       prisma.project.count(),
       prisma.accomplishment.count(),
       prisma.contactMessage.count(),
       prisma.contactMessage.count({ where: { read: false } }),
+      prisma.skill.count(),
+      prisma.blogPost.count({ where: { published: true } }),
     ]);
 
   const stats = [
@@ -25,6 +27,18 @@ export default async function AdminDashboard() {
       value: accomplishmentCount,
       icon: Star,
       href: "/admin/accomplishments",
+    },
+    {
+      label: "Tech Stack",
+      value: skillCount,
+      icon: Code2,
+      href: "/admin/skills",
+    },
+    {
+      label: "Articles publiés",
+      value: blogCount,
+      icon: BookOpen,
+      href: "/admin/blog",
     },
     {
       label: "Messages",
@@ -44,7 +58,7 @@ export default async function AdminDashboard() {
         Dashboard
       </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
         {stats.map(({ label, value, icon: Icon, badge, href }) => (
           <a
             key={label}
@@ -93,6 +107,8 @@ export default async function AdminDashboard() {
           {[
             { label: "Modifier le profil", href: "/admin/settings" },
             { label: "Ajouter un projet", href: "/admin/projects" },
+            { label: "Gérer le Tech Stack", href: "/admin/skills" },
+            { label: "Nouvel article", href: "/admin/blog" },
             { label: "Voir le portfolio", href: "/fr" },
           ].map(({ label, href }) => (
             <a

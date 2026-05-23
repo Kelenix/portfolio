@@ -11,13 +11,16 @@ import {
   MessageSquare,
   Settings,
   LogOut,
-  User,
+  Code2,
+  BookOpen,
 } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/projects", label: "Projets", icon: FolderOpen },
   { href: "/admin/accomplishments", label: "Accomplissements", icon: Star },
+  { href: "/admin/skills", label: "Tech Stack", icon: Code2 },
+  { href: "/admin/blog", label: "Blog", icon: BookOpen },
   { href: "/admin/social", label: "Réseaux", icon: Share2 },
   { href: "/admin/messages", label: "Messages", icon: MessageSquare },
   { href: "/admin/settings", label: "Paramètres", icon: Settings },

@@ -3,46 +3,53 @@
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import {
-  SiReact, SiNextdotjs, SiTypescript, SiTailwindcss, SiFramer,
-  SiNodedotjs, SiPrisma, SiPostgresql, SiSqlite, SiGraphql,
-  SiVercel, SiDocker, SiGithubactions, SiGit,
-  SiFigma, SiPostman,
+  SiReact, SiNextdotjs, SiTypescript, SiJavascript, SiTailwindcss, SiFramer,
+  SiVuedotjs, SiAngular, SiSvelte, SiAstro,
+  SiNodedotjs, SiPrisma, SiPostgresql, SiMongodb, SiMysql, SiSqlite, SiGraphql,
+  SiPython, SiDjango, SiPhp, SiLaravel, SiRust, SiGo, SiRedis, SiSupabase, SiFirebase,
+  SiDocker, SiKubernetes, SiVercel, SiGithubactions, SiGit, SiNginx, SiLinux,
+  SiGooglecloud,
+  SiFigma, SiPostman, SiGithub, SiNotion, SiJira,
 } from "react-icons/si";
 import { TbApi, TbBrandVscode } from "react-icons/tb";
+import type { IconType } from "react-icons";
 
-const techGroups = {
-  frontend: [
-    { name: "React", icon: SiReact },
-    { name: "Next.js", icon: SiNextdotjs },
-    { name: "TypeScript", icon: SiTypescript },
-    { name: "Tailwind CSS", icon: SiTailwindcss },
-    { name: "Framer Motion", icon: SiFramer },
-  ],
-  backend: [
-    { name: "Node.js", icon: SiNodedotjs },
-    { name: "Prisma", icon: SiPrisma },
-    { name: "PostgreSQL", icon: SiPostgresql },
-    { name: "SQLite", icon: SiSqlite },
-    { name: "GraphQL", icon: SiGraphql },
-  ],
-  devops: [
-    { name: "Vercel", icon: SiVercel },
-    { name: "Docker", icon: SiDocker },
-    { name: "GitHub Actions", icon: SiGithubactions },
-    { name: "Git", icon: SiGit },
-  ],
-  tools: [
-    { name: "VS Code", icon: TbBrandVscode },
-    { name: "Figma", icon: SiFigma },
-    { name: "Postman", icon: SiPostman },
-    { name: "REST API", icon: TbApi },
-  ],
-} as const;
+export const ICON_MAP: Record<string, IconType> = {
+  SiReact, SiNextdotjs, SiTypescript, SiJavascript, SiTailwindcss, SiFramer,
+  SiVuedotjs, SiAngular, SiSvelte, SiAstro,
+  SiNodedotjs, SiPrisma, SiPostgresql, SiMongodb, SiMysql, SiSqlite, SiGraphql,
+  SiPython, SiDjango, SiPhp, SiLaravel, SiRust, SiGo, SiRedis, SiSupabase, SiFirebase,
+  SiDocker, SiKubernetes, SiVercel, SiGithubactions, SiGit, SiNginx, SiLinux,
+  SiGooglecloud,
+  SiFigma, SiPostman, SiGithub, SiNotion, SiJira,
+  TbBrandVscode, TbApi,
+};
 
-type GroupKey = keyof typeof techGroups;
+export type SkillCategory = "frontend" | "backend" | "devops" | "tools";
 
-export function TechStack() {
+export interface SkillItem {
+  id: string;
+  name: string;
+  iconName: string;
+  category: string;
+}
+
+const CATEGORY_ORDER: SkillCategory[] = ["frontend", "backend", "devops", "tools"];
+
+export function TechStack({ skills }: { skills: SkillItem[] }) {
   const t = useTranslations("tech");
+
+  const grouped = CATEGORY_ORDER.reduce<Record<SkillCategory, SkillItem[]>>(
+    (acc, cat) => {
+      acc[cat] = skills.filter((s) => s.category === cat);
+      return acc;
+    },
+    { frontend: [], backend: [], devops: [], tools: [] }
+  );
+
+  const visibleGroups = CATEGORY_ORDER.filter((cat) => grouped[cat].length > 0);
+
+  if (visibleGroups.length === 0) return null;
 
   return (
     <section className="mx-auto max-w-4xl px-6 py-16">
@@ -60,47 +67,45 @@ export function TechStack() {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-          {(Object.entries(techGroups) as [GroupKey, (typeof techGroups)[GroupKey]][]).map(
-            ([group, items], gi) => (
-              <motion.div
-                key={group}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: gi * 0.1, duration: 0.4 }}
+          {visibleGroups.map((group, gi) => (
+            <motion.div
+              key={group}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: gi * 0.1, duration: 0.4 }}
+            >
+              <p
+                className="text-xs font-mono font-semibold tracking-wider uppercase mb-4"
+                style={{ color: "var(--muted-foreground)" }}
               >
-                <p
-                  className="text-xs font-mono font-semibold tracking-wider uppercase mb-4"
-                  style={{ color: "var(--muted-foreground)" }}
-                >
-                  {t(group)}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {items.map((tech, i) => {
-                    const Icon = tech.icon;
-                    return (
-                      <motion.div
-                        key={tech.name}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: gi * 0.05 + i * 0.04, duration: 0.3 }}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-mono cursor-default transition-colors duration-150"
-                        style={{
-                          borderColor: "var(--border)",
-                          background: "var(--muted)",
-                          color: "var(--foreground)",
-                        }}
-                      >
-                        <Icon size={13} style={{ color: "var(--muted-foreground)" }} />
-                        {tech.name}
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )
-          )}
+                {t(group)}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {grouped[group].map((skill, i) => {
+                  const Icon = ICON_MAP[skill.iconName];
+                  return (
+                    <motion.div
+                      key={skill.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: gi * 0.05 + i * 0.04, duration: 0.3 }}
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-mono cursor-default transition-colors duration-150"
+                      style={{
+                        borderColor: "var(--border)",
+                        background: "var(--muted)",
+                        color: "var(--foreground)",
+                      }}
+                    >
+                      {Icon && <Icon size={13} style={{ color: "var(--muted-foreground)" }} />}
+                      {skill.name}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          ))}
         </div>
       </motion.div>
     </section>
