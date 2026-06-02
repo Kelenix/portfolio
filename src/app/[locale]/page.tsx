@@ -77,7 +77,11 @@ export default async function HomePage() {
     id: a.id,
     text: isEn ? a.textEn : isIt ? a.textIt : a.textFr,
     link: a.link,
-    linkLabel: a.linkLabel,
+    linkLabel: isEn
+      ? (a.linkLabelEn || a.linkLabel)
+      : isIt
+        ? (a.linkLabelIt || a.linkLabel)
+        : a.linkLabel,
   }));
 
   const projectItems = projects.map((p) => ({

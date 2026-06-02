@@ -35,16 +35,18 @@ model Project {
 }
 
 model Accomplishment {
-  id        String   @id @default(cuid())
-  textFr    String
-  textEn    String
-  textIt    String
-  link      String?
-  linkLabel String?
-  order     Int      @default(0)
-  published Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  textFr      String
+  textEn      String
+  textIt      String
+  link        String?
+  linkLabel   String?
+  linkLabelEn String?
+  linkLabelIt String?
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model SocialLink {

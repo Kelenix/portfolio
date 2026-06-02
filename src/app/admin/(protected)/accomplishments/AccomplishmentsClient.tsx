@@ -14,6 +14,8 @@ const schema = z.object({
   textIt: z.string().min(1, "Obbligatorio"),
   link: z.string().optional(),
   linkLabel: z.string().optional(),
+  linkLabelEn: z.string().optional(),
+  linkLabelIt: z.string().optional(),
   published: z.boolean().optional(),
 });
 
@@ -33,7 +35,16 @@ export function AccomplishmentsClient({ initialItems }: { initialItems: Accompli
 
   const openCreate = () => {
     setEditId(null);
-    reset({ textFr: "", textEn: "", textIt: "", link: "", linkLabel: "", published: true });
+    reset({
+      textFr: "",
+      textEn: "",
+      textIt: "",
+      link: "",
+      linkLabel: "",
+      linkLabelEn: "",
+      linkLabelIt: "",
+      published: true,
+    });
     setShowForm(true);
   };
 
@@ -45,6 +56,8 @@ export function AccomplishmentsClient({ initialItems }: { initialItems: Accompli
       textIt: a.textIt,
       link: a.link ?? "",
       linkLabel: a.linkLabel ?? "",
+      linkLabelEn: a.linkLabelEn ?? "",
+      linkLabelIt: a.linkLabelIt ?? "",
       published: a.published,
     });
     setShowForm(true);
@@ -57,6 +70,8 @@ export function AccomplishmentsClient({ initialItems }: { initialItems: Accompli
         published: data.published ?? true,
         link: data.link || null,
         linkLabel: data.linkLabel || null,
+        linkLabelEn: data.linkLabelEn || null,
+        linkLabelIt: data.linkLabelIt || null,
         order: editId ? undefined : items.length,
       };
       const method = editId ? "PUT" : "POST";
@@ -187,39 +202,47 @@ export function AccomplishmentsClient({ initialItems }: { initialItems: Accompli
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {tabs.map((tab) => (
-                <div key={tab} className={activeTab === tab ? "" : "hidden"}>
-                  <label className="block text-xs font-mono mb-1" style={{ color: "var(--muted-foreground)" }}>
-                    Texte ({tab.toUpperCase()}) — utiliser **gras** pour mettre en valeur
-                  </label>
-                  <textarea
-                    {...register(fieldKey(tab))}
-                    rows={3}
-                    className="w-full px-3 py-2 text-sm rounded-lg border outline-none resize-none"
-                    style={{ background: "var(--muted)", borderColor: "var(--border)", color: "var(--foreground)" }}
-                  />
-                </div>
-              ))}
+              {tabs.map((tab) => {
+                const linkLabelKey =
+                  tab === "fr" ? "linkLabel" : tab === "en" ? "linkLabelEn" : "linkLabelIt";
+                const linkLabelPlaceholder =
+                  tab === "fr" ? "Voir le lien" : tab === "en" ? "View link" : "Vedi link";
+                return (
+                  <div key={tab} className={activeTab === tab ? "space-y-3" : "hidden"}>
+                    <div>
+                      <label className="block text-xs font-mono mb-1" style={{ color: "var(--muted-foreground)" }}>
+                        Texte ({tab.toUpperCase()}) — utiliser **gras** pour mettre en valeur
+                      </label>
+                      <textarea
+                        {...register(fieldKey(tab))}
+                        rows={3}
+                        className="w-full px-3 py-2 text-sm rounded-lg border outline-none resize-none"
+                        style={{ background: "var(--muted)", borderColor: "var(--border)", color: "var(--foreground)" }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-mono mb-1" style={{ color: "var(--muted-foreground)" }}>
+                        Label du lien ({tab.toUpperCase()})
+                      </label>
+                      <input
+                        {...register(linkLabelKey)}
+                        className="w-full px-3 py-2 text-sm rounded-lg border outline-none"
+                        style={{ background: "var(--muted)", borderColor: "var(--border)", color: "var(--foreground)" }}
+                        placeholder={linkLabelPlaceholder}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-mono mb-1" style={{ color: "var(--muted-foreground)" }}>Lien (optionnel)</label>
-                  <input
-                    {...register("link")}
-                    className="w-full px-3 py-2 text-sm rounded-lg border outline-none"
-                    style={{ background: "var(--muted)", borderColor: "var(--border)", color: "var(--foreground)" }}
-                    placeholder="https://..."
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-mono mb-1" style={{ color: "var(--muted-foreground)" }}>Label du lien</label>
-                  <input
-                    {...register("linkLabel")}
-                    className="w-full px-3 py-2 text-sm rounded-lg border outline-none"
-                    style={{ background: "var(--muted)", borderColor: "var(--border)", color: "var(--foreground)" }}
-                    placeholder="Voir le lien"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-mono mb-1" style={{ color: "var(--muted-foreground)" }}>Lien (optionnel)</label>
+                <input
+                  {...register("link")}
+                  className="w-full px-3 py-2 text-sm rounded-lg border outline-none"
+                  style={{ background: "var(--muted)", borderColor: "var(--border)", color: "var(--foreground)" }}
+                  placeholder="https://..."
+                />
               </div>
 
               <div className="flex items-center justify-between pt-2">
