@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { getSiteUrl, SITE_NAME } from "@/lib/seo";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,12 +14,44 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
   title: {
-    template: "%s | Portfolio",
-    default: "Portfolio — Développeur Fullstack",
+    template: `%s | ${SITE_NAME}`,
+    default: `${SITE_NAME} — Développeur Fullstack`,
   },
-  description: "Développeur Fullstack passionné par le design et l'expérience utilisateur.",
-  robots: { index: true, follow: true },
+  description:
+    "Développeur Fullstack passionné par le design et l'expérience utilisateur.",
+  applicationName: SITE_NAME,
+  generator: "Next.js",
+  referrer: "origin-when-cross-origin",
+  formatDetection: { telephone: false, address: false, email: false },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
+    },
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
+  manifest: "/manifest.webmanifest",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({

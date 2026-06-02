@@ -47,7 +47,7 @@ export function Sidebar() {
           className="text-xs font-mono font-bold tracking-widest uppercase"
           style={{ color: "var(--foreground)" }}
         >
-          PORTFOLIO
+          LIONEL.DEV
         </p>
         <p
           className="text-xs font-mono mt-0.5"

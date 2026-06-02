@@ -3,9 +3,22 @@ import { getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { boldMarkdown } from "@/lib/utils";
+import {
+  type AppLocale,
+  buildLanguageAlternates,
+  localizedPath,
+  pickLocaleField,
+  getSiteUrl,
+} from "@/lib/seo";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+function excerpt(content: string, max = 160): string {
+  const plain = content.replace(/\*\*/g, "").replace(/\s+/g, " ").trim();
+  if (plain.length <= max) return plain;
+  return plain.slice(0, max - 1).trimEnd() + "…";
+}
 
 export async function generateMetadata({
   params,
@@ -13,9 +26,40 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const locale = (await getLocale()) as AppLocale;
   const post = await prisma.blogPost.findUnique({ where: { slug } });
-  if (!post) return { title: "Article introuvable" };
-  return { title: post.titleFr };
+  if (!post) return { title: "Article introuvable", robots: { index: false } };
+
+  const title = pickLocaleField(locale, {
+    fr: post.titleFr,
+    en: post.titleEn,
+    it: post.titleIt,
+  });
+  const content = pickLocaleField(locale, {
+    fr: post.contentFr,
+    en: post.contentEn,
+    it: post.contentIt,
+  });
+  const description = excerpt(content);
+  const url = localizedPath(locale, `/blog/${post.slug}`);
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+      languages: buildLanguageAlternates(`/blog/${post.slug}`),
+    },
+    openGraph: {
+      type: "article",
+      title,
+      description,
+      url,
+      publishedTime: post.publishedAt?.toISOString(),
+      modifiedTime: post.updatedAt.toISOString(),
+    },
+    twitter: { card: "summary_large_image", title, description },
+  };
 }
 
 export default async function BlogPostPage({
@@ -24,18 +68,58 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const locale = await getLocale();
+  const locale = (await getLocale()) as AppLocale;
   const isEn = locale === "en";
   const isIt = locale === "it";
 
   const post = await prisma.blogPost.findUnique({ where: { slug, published: true } });
   if (!post) notFound();
 
+  const profile = await prisma.profile.findFirst({ where: { id: "default" } });
+
   const title = isEn ? post.titleEn : isIt ? post.titleIt : post.titleFr;
   const content = isEn ? post.contentEn : isIt ? post.contentIt : post.contentFr;
 
+  const authorName = profile
+    ? pickLocaleField(locale, {
+        fr: profile.nameFr,
+        en: profile.nameEn,
+        it: profile.nameIt,
+      })
+    : "Author";
+
+  const url = localizedPath(locale, `/blog/${post.slug}`);
+  const siteUrl = getSiteUrl();
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: title,
+    description: excerpt(content),
+    inLanguage: locale,
+    datePublished: post.publishedAt?.toISOString(),
+    dateModified: post.updatedAt.toISOString(),
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    author: {
+      "@type": "Person",
+      name: authorName,
+      url: localizedPath(locale, "/"),
+    },
+    publisher: {
+      "@type": "Person",
+      name: authorName,
+      url: siteUrl,
+    },
+    image: profile?.photoUrl ? [profile.photoUrl] : undefined,
+  };
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Link
         href="/blog"
         className="text-xs font-mono mb-8 block hover:opacity-70 transition-opacity"

@@ -5,21 +5,28 @@ import { Accomplishments } from "@/components/sections/Accomplishments";
 import { Projects } from "@/components/sections/Projects";
 import { TechStack } from "@/components/sections/TechStack";
 import { Contact } from "@/components/sections/Contact";
+import {
+  type AppLocale,
+  buildLanguageAlternates,
+  getSiteUrl,
+  localizedPath,
+} from "@/lib/seo";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = (await getLocale()) as AppLocale;
   return {
-    title: "Portfolio",
     alternates: {
-      canonical: "/",
+      canonical: localizedPath(locale, "/"),
+      languages: buildLanguageAlternates("/"),
     },
   };
 }
 
 export default async function HomePage() {
-  const locale = await getLocale();
+  const locale = (await getLocale()) as AppLocale;
   const isEn = locale === "en";
   const isIt = locale === "it";
 
@@ -77,8 +84,43 @@ export default async function HomePage() {
     tags: p.tags,
   }));
 
+  const siteUrl = getSiteUrl();
+  const homeUrl = localizedPath(locale, "/");
+
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: profileData.name,
+    jobTitle: profileData.role,
+    description: profileData.bio,
+    email: profileData.email ? `mailto:${profileData.email}` : undefined,
+    image: profileData.photoUrl || undefined,
+    url: homeUrl,
+    sameAs: profileData.socials.map((s) => s.url),
+    knowsAbout: skills.map((s) => s.name),
+  };
+
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: profileData.name,
+    url: siteUrl,
+    inLanguage: locale,
+    author: { "@type": "Person", name: profileData.name },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
       <Hero profile={profileData} />
       <Accomplishments items={accomplishmentItems} />
       <Projects items={projectItems} />

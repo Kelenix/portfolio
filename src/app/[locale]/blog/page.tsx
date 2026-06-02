@@ -1,13 +1,35 @@
 import { prisma } from "@/lib/db";
 import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import {
+  type AppLocale,
+  buildLanguageAlternates,
+  localizedPath,
+} from "@/lib/seo";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("blog");
-  return { title: t("title") };
+  const locale = (await getLocale()) as AppLocale;
+  const title = t("title");
+  const description = t("subtitle");
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: localizedPath(locale, "/blog"),
+      languages: buildLanguageAlternates("/blog"),
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: localizedPath(locale, "/blog"),
+    },
+    twitter: { card: "summary_large_image", title, description },
+  };
 }
 
 export default async function BlogPage() {

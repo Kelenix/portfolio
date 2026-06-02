@@ -40,7 +40,7 @@ export function Header({ locale }: HeaderProps) {
           className="font-mono text-sm font-semibold tracking-wider hover:opacity-70 transition-opacity"
           style={{ color: "var(--foreground)" }}
         >
-          PORTFOLIO.DEV
+          LIONEL.DEV
         </Link>
 
         {/* Desktop nav */}

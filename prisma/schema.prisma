@@ -93,6 +93,21 @@ model Skill {
   updatedAt DateTime @updatedAt
 }
 
+model MobileApp {
+  id            String   @id @default(cuid())
+  name          String
+  descFr        String   @default("")
+  descEn        String   @default("")
+  descIt        String   @default("")
+  iconUrl       String   @default("")
+  playStoreUrl  String?
+  appStoreUrl   String?
+  order         Int      @default(0)
+  published     Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
 model FooterLink {
   id        String   @id @default(cuid())
   labelFr   String

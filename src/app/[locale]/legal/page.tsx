@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getLocale } from "next-intl/server";
+import { buildLanguageAlternates, localizedPath } from "@/lib/seo";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -125,7 +126,15 @@ const sections: Record<
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
-  return { title: titles[locale] ?? titles.fr };
+  const title = titles[locale] ?? titles.fr;
+  return {
+    title,
+    alternates: {
+      canonical: localizedPath(locale, "/legal"),
+      languages: buildLanguageAlternates("/legal"),
+    },
+    openGraph: { title, type: "website" },
+  };
 }
 
 export default async function LegalPage() {
