@@ -14,11 +14,13 @@ import {
   Code2,
   BookOpen,
   PanelBottom,
+  Smartphone,
 } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/projects", label: "Projets", icon: FolderOpen },
+  { href: "/admin/mobile-apps", label: "Apps mobiles", icon: Smartphone },
   { href: "/admin/accomplishments", label: "Accomplissements", icon: Star },
   { href: "/admin/skills", label: "Tech Stack", icon: Code2 },
   { href: "/admin/blog", label: "Blog", icon: BookOpen },

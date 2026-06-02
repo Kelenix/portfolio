@@ -16,6 +16,9 @@
     "viewProject": "View project",
     "viewCode": "Source code"
   },
+  "mobileApps": {
+    "title": "My mobile apps"
+  },
   "tech": {
     "title": "Tech I love",
     "frontend": "Frontend",

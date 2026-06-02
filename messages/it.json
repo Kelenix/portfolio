@@ -16,6 +16,9 @@
     "viewProject": "Vedi progetto",
     "viewCode": "Codice sorgente"
   },
+  "mobileApps": {
+    "title": "Le mie app mobile"
+  },
   "tech": {
     "title": "Tech che amo",
     "frontend": "Frontend",

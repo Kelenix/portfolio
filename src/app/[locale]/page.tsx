@@ -3,6 +3,7 @@ import { getLocale } from "next-intl/server";
 import { Hero } from "@/components/sections/Hero";
 import { Accomplishments } from "@/components/sections/Accomplishments";
 import { Projects } from "@/components/sections/Projects";
+import { MobileApps } from "@/components/sections/MobileApps";
 import { TechStack } from "@/components/sections/TechStack";
 import { Contact } from "@/components/sections/Contact";
 import {
@@ -30,7 +31,7 @@ export default async function HomePage() {
   const isEn = locale === "en";
   const isIt = locale === "it";
 
-  const [profile, socials, accomplishments, projects, skills] = await Promise.all([
+  const [profile, socials, accomplishments, projects, mobileApps, skills] = await Promise.all([
     prisma.profile.findFirst({ where: { id: "default" } }),
     prisma.socialLink.findMany({ orderBy: { order: "asc" } }),
     prisma.accomplishment.findMany({
@@ -38,6 +39,10 @@ export default async function HomePage() {
       orderBy: { order: "asc" },
     }),
     prisma.project.findMany({
+      where: { published: true },
+      orderBy: { order: "asc" },
+    }),
+    prisma.mobileApp.findMany({
       where: { published: true },
       orderBy: { order: "asc" },
     }),
@@ -84,6 +89,15 @@ export default async function HomePage() {
     tags: p.tags,
   }));
 
+  const mobileAppItems = mobileApps.map((a) => ({
+    id: a.id,
+    name: a.name,
+    desc: isEn ? a.descEn : isIt ? a.descIt : a.descFr,
+    iconUrl: a.iconUrl,
+    playStoreUrl: a.playStoreUrl,
+    appStoreUrl: a.appStoreUrl,
+  }));
+
   const siteUrl = getSiteUrl();
   const homeUrl = localizedPath(locale, "/");
 
@@ -124,6 +138,7 @@ export default async function HomePage() {
       <Hero profile={profileData} />
       <Accomplishments items={accomplishmentItems} />
       <Projects items={projectItems} />
+      <MobileApps items={mobileAppItems} />
       <TechStack skills={skills} />
       <Contact email={profileData.email} />
     </>
