@@ -13,6 +13,7 @@ import {
   LogOut,
   Code2,
   BookOpen,
+  PanelBottom,
 } from "lucide-react";
 
 const navItems = [
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/admin/skills", label: "Tech Stack", icon: Code2 },
   { href: "/admin/blog", label: "Blog", icon: BookOpen },
   { href: "/admin/social", label: "Réseaux", icon: Share2 },
+  { href: "/admin/footer", label: "Footer", icon: PanelBottom },
   { href: "/admin/messages", label: "Messages", icon: MessageSquare },
   { href: "/admin/settings", label: "Paramètres", icon: Settings },
 ];
