@@ -9,8 +9,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Développeur Fullstack passionné par le design et l'expérience utilisateur.",
     start_url: "/",
     display: "standalone",
-    background_color: "#0a0a0a",
-    theme_color: "#0a0a0a",
+    background_color: "#000000",
+    theme_color: "#000000",
     icons: [
       {
         src: "/favicon.ico",

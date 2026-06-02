@@ -21,12 +21,12 @@
 }
 
 .dark {
-  --background: #111827;
-  --foreground: #f9fafb;
-  --muted: #1f2937;
-  --muted-foreground: #9ca3af;
-  --border: #374151;
-  --accent: #f9fafb;
+  --background: #000000;
+  --foreground: #ffffff;
+  --muted: #0a0a0a;
+  --muted-foreground: #a1a1aa;
+  --border: #27272a;
+  --accent: #ffffff;
 }
 
 * {
