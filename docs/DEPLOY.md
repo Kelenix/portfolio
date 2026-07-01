@@ -73,12 +73,14 @@ DIRECT_URL="postgresql://postgres.abcxyz:MotDePasse@aws-0-eu-west-1.pooler.supab
 
 ### 1.4 Initialiser le schéma
 
-Depuis votre machine, après avoir rempli `.env` :
+Depuis votre machine, après avoir rempli `.env` (dont `ADMIN_EMAIL` et `ADMIN_PASSWORD`) :
 
 ```bash
 npx prisma db push      # crée les tables
 npm run db:seed         # insère l'utilisateur admin + données par défaut
 ```
+
+> Le seed **refuse de démarrer** si `ADMIN_EMAIL` ou `ADMIN_PASSWORD` sont manquants, ou si `ADMIN_PASSWORD` fait moins de 12 caractères. Aucun couple par défaut n'existe.
 
 ### Mots de passe Supabase
 
@@ -110,8 +112,10 @@ AUTH_SECRET=...                                    # openssl rand -base64 32
 AUTH_URL=https://ton-domaine.com                   # URL canonique sans /
 NEXTAUTH_URL=https://ton-domaine.com               # identique
 
-ADMIN_EMAIL=...
-ADMIN_PASSWORD=...
+ADMIN_EMAIL=...                                    # email admin (identifiant de login possible)
+ADMIN_PASSWORD=...                                 # min 12 caractères — imposé par le seed
+ADMIN_USERNAME=...                                 # optionnel — permet un login par pseudo
+ADMIN_NAME=...                                     # optionnel — nom affiché ("Admin" par défaut)
 
 SUPABASE_URL=https://abcxyz.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...

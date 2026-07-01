@@ -21,11 +21,28 @@ Manuel d'utilisation du dashboard admin du portfolio. Toutes les sections sont a
 
 URL : `https://votre-domaine.com/admin/login`
 
-Saisir l'email et le mot de passe définis dans les variables `ADMIN_EMAIL` / `ADMIN_PASSWORD` au seed initial. Le mot de passe est hashé (bcrypt) en DB.
+Saisir **email ou username** + mot de passe. Les credentials proviennent des variables `ADMIN_EMAIL`, `ADMIN_PASSWORD` (et optionnellement `ADMIN_USERNAME`) définies au seed. Le mot de passe est hashé (bcrypt) en DB.
 
 > Pour changer le mot de passe après le premier accès, aller dans **Paramètres** → **Changer le mot de passe**.
 
-La session est un JWT signé (NextAuth v5), valable 30 jours.
+### Sécurité
+
+| Mécanisme | Détail |
+|---|---|
+| Hash mot de passe | bcrypt (12 rounds) |
+| Rate-limit login | 5 tentatives / 15 min par IP → verrouillage 15 min |
+| Session | JWT signé (NextAuth v5), 30 jours, refresh max toutes les heures |
+| Session expirée | Modale automatique + redirection vers `/admin/login?reason=expired` sur tout 401 admin |
+| Garde-fou API | Middleware (`src/proxy.ts`) rejette toute requête `/api/admin/*` sans jeton valide |
+| Journal | Table `AuditLog` — connexions, échecs, verrouillages — consultable dans **Journal** |
+| CSRF | Géré nativement par NextAuth v5 sur les endpoints d'authentification |
+| Seed | Refuse de démarrer sans `ADMIN_EMAIL` / `ADMIN_PASSWORD` ≥ 12 caractères |
+
+Aucun couple d'identifiants par défaut n'existe. Le seul chemin d'accès admin est `/admin/login`.
+
+### Journal
+
+`/admin/audit` — lecture seule des 100 dernières entrées avec date, action, acteur, IP, détails. Permet d'auditer les connexions et les tentatives suspectes.
 
 ## Vue d'ensemble du dashboard
 

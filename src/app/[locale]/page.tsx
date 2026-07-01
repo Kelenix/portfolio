@@ -70,7 +70,7 @@ export default async function HomePage() {
         : (profile?.bioFr ?? ""),
     email: profile?.email ?? "contact@example.com",
     photoUrl: profile?.photoUrl,
-    socials: socials.map((s) => ({ platform: s.platform, url: s.url })),
+    socials: socials.map((s) => ({ id: s.id, platform: s.platform, url: s.url })),
   };
 
   const accomplishmentItems = accomplishments.map((a) => ({

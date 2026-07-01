@@ -8,6 +8,7 @@ import { FaGithub, FaLinkedinIn, FaYoutube } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
 interface SocialLink {
+  id: string;
   platform: string;
   url: string;
 }
@@ -88,7 +89,7 @@ export function Hero({ profile }: { profile: ProfileData }) {
         <motion.div variants={item} className="flex flex-wrap gap-2">
           {profile.socials.map((social) => (
             <a
-              key={social.platform}
+              key={social.id}
               href={social.url}
               target="_blank"
               rel="noopener noreferrer"

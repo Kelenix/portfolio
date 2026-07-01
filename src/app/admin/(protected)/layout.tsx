@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { ToastContainer } from "@/components/admin/Toast";
+import { AdminSessionGuard } from "@/components/admin/AdminSessionGuard";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import type { Metadata } from "next";
 
@@ -39,6 +40,7 @@ export default async function ProtectedAdminLayout({
           <main className="flex-1 p-8">{children}</main>
         </div>
         <ToastContainer />
+        <AdminSessionGuard />
       </div>
     </ThemeProvider>
   );
