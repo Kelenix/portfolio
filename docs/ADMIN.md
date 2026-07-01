@@ -30,9 +30,9 @@ Saisir **email ou username** + mot de passe. Les credentials proviennent des var
 | Mécanisme | Détail |
 |---|---|
 | Hash mot de passe | bcrypt (12 rounds) |
-| Rate-limit login | 5 tentatives / 15 min par IP → verrouillage 15 min |
-| Session | JWT signé (NextAuth v5), 30 jours, refresh max toutes les heures |
-| Session expirée | Modale automatique + redirection vers `/admin/login?reason=expired` sur tout 401 admin |
+| Rate-limit login | 5 tentatives / 15 min par IP → 15 min bloquée (retour `Identifiants incorrects` côté visiteur, `login.locked` dans le journal) |
+| Session | JWT signé (NextAuth v5), maxAge 5 min, refresh à chaque activité (updateAge 60 s) — équivalent à un idle-timeout de 5 min |
+| Session expirée | Redirection automatique vers `/admin/login?reason=expired` sur tout 401 admin |
 | Garde-fou API | Middleware (`src/proxy.ts`) rejette toute requête `/api/admin/*` sans jeton valide |
 | Journal | Table `AuditLog` — connexions, échecs, verrouillages — consultable dans **Journal** |
 | CSRF | Géré nativement par NextAuth v5 sur les endpoints d'authentification |

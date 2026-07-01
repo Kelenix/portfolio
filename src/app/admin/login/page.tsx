@@ -15,12 +15,6 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-function formatLockMessage(seconds: number): string {
-  const minutes = Math.ceil(seconds / 60);
-  if (minutes <= 1) return "Trop de tentatives. Réessayez dans moins d'une minute.";
-  return `Trop de tentatives. Réessayez dans ${minutes} minutes.`;
-}
-
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -41,13 +35,7 @@ function LoginForm() {
     });
 
     if (result?.error) {
-      const raw = result.error;
-      if (raw.includes("RATE_LIMITED")) {
-        const seconds = Number(raw.split(":").pop()) || 900;
-        setError(formatLockMessage(seconds));
-      } else {
-        setError("Identifiants incorrects");
-      }
+      setError("Identifiants incorrects");
       return;
     }
 

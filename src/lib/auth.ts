@@ -45,7 +45,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             userAgent,
             metadata: { retryAfterSec: gate.retryAfterSec },
           });
-          throw new Error(`RATE_LIMITED:${gate.retryAfterSec}`);
+          return null;
         }
 
         const identifier = parsed.data.identifier.trim();
@@ -95,8 +95,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
-    updateAge: 60 * 60,
+    maxAge: 5 * 60,
+    updateAge: 60,
   },
   callbacks: {
     jwt({ token, user }) {

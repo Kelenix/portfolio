@@ -8,8 +8,32 @@ const intlMiddleware = createMiddleware(routing);
 async function isAuthenticated(request: NextRequest): Promise<boolean> {
   const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
   if (!secret) return false;
-  const token = await getToken({ req: request, secret });
-  return !!token;
+
+  const isHttps = request.nextUrl.protocol === "https:";
+  const candidates = isHttps
+    ? [
+        "__Secure-authjs.session-token",
+        "__Secure-next-auth.session-token",
+        "authjs.session-token",
+        "next-auth.session-token",
+      ]
+    : ["authjs.session-token", "next-auth.session-token"];
+
+  for (const cookieName of candidates) {
+    if (!request.cookies.get(cookieName)?.value) continue;
+    try {
+      const token = await getToken({
+        req: request,
+        secret,
+        cookieName,
+        secureCookie: cookieName.startsWith("__Secure-"),
+      });
+      if (token) return true;
+    } catch {
+      /* try next candidate */
+    }
+  }
+  return false;
 }
 
 export default async function proxy(request: NextRequest) {
