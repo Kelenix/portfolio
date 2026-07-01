@@ -6,6 +6,7 @@ import { getSiteUrl } from "@/lib/seo";
 import {
   ESCALATION_MESSAGES,
   botLocaleFromAcceptLanguage,
+  type BotLocale,
 } from "@/lib/chatbot";
 
 export async function POST(req: NextRequest) {
@@ -21,7 +22,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No conversation" }, { status: 404 });
   }
 
-  const locale = botLocaleFromAcceptLanguage(req.headers.get("accept-language"));
+  let bodyLocale: BotLocale | null = null;
+  try {
+    const raw = (await req.json()) as { locale?: string } | null;
+    if (raw?.locale === "fr" || raw?.locale === "en" || raw?.locale === "it") {
+      bodyLocale = raw.locale;
+    }
+  } catch {
+    /* no body */
+  }
+  const locale =
+    bodyLocale ?? botLocaleFromAcceptLanguage(req.headers.get("accept-language"));
 
   if (conversation.mode === "bot" || conversation.mode === "closed") {
     await prisma.chatConversation.update({

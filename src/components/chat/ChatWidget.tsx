@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { MessageCircle, X, Send, Loader2, User, Bot, UserPlus } from "lucide-react";
 
 type Sender = "visitor" | "admin" | "bot";
@@ -34,6 +34,7 @@ type Props = {
 
 export function ChatWidget({ avatarUrl, adminName }: Props = {}) {
   const t = useTranslations("chat");
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [body, setBody] = useState("");
@@ -120,6 +121,7 @@ export function ChatWidget({ avatarUrl, adminName }: Props = {}) {
           body: trimmed,
           visitorName: name.trim() || null,
           visitorEmail: email.trim() || null,
+          locale,
         }),
       });
       if (res.status === 429) {
@@ -165,7 +167,11 @@ export function ChatWidget({ avatarUrl, adminName }: Props = {}) {
     if (escalating) return;
     setEscalating(true);
     try {
-      const res = await fetch("/api/chat/escalate", { method: "POST" });
+      const res = await fetch("/api/chat/escalate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locale }),
+      });
       if (!res.ok) return;
       setMode("wait_human");
     } catch {

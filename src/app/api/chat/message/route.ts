@@ -15,6 +15,7 @@ const schema = z.object({
   body: z.string().min(1).max(4000),
   visitorName: z.string().max(100).optional().nullable(),
   visitorEmail: z.string().email().max(200).optional().nullable(),
+  locale: z.enum(["fr", "en", "it"]).optional(),
 });
 
 const CHAT_RATE_LIMIT = { max: 20, windowMs: 5 * 60_000, lockMs: 5 * 60_000 };
@@ -71,7 +72,9 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  const locale = botLocaleFromAcceptLanguage(req.headers.get("accept-language"));
+  const locale =
+    parsed.data.locale ??
+    botLocaleFromAcceptLanguage(req.headers.get("accept-language"));
   let botReply: {
     id: string;
     sender: string;

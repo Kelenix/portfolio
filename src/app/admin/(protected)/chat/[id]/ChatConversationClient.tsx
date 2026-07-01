@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Send, Loader2, Trash2, Archive, RefreshCw } from "lucide-react";
+import { ArrowLeft, Send, Loader2, Trash2, Archive, RefreshCw, Bot } from "lucide-react";
 import { useToast } from "@/components/admin/Toast";
 
 type Message = {
@@ -17,6 +17,7 @@ type Conversation = {
   visitorName: string | null;
   visitorEmail: string | null;
   status: string;
+  mode?: string;
   createdAt: string;
 };
 
@@ -129,6 +130,24 @@ export function ChatConversationClient({
     }
   };
 
+  const setMode = async (mode: "bot" | "human") => {
+    try {
+      const res = await fetch(`/api/admin/chat/${conversation.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode }),
+      });
+      if (!res.ok) throw new Error();
+      setConversation((prev) => ({ ...prev, mode }));
+      toast(
+        "success",
+        mode === "bot" ? "Bot réactivé sur cette conversation" : "Bot désactivé"
+      );
+    } catch {
+      toast("error", "Une erreur est survenue");
+    }
+  };
+
   const remove = async () => {
     if (!confirm("Supprimer définitivement cette conversation ?")) return;
     try {
@@ -158,6 +177,16 @@ export function ChatConversationClient({
           <ArrowLeft size={12} /> Retour
         </Link>
         <div className="flex items-center gap-2">
+          {conversation.mode !== "bot" && (
+            <button
+              onClick={() => setMode("bot")}
+              className="flex items-center gap-1.5 text-xs font-mono px-2 py-1 rounded border hover:opacity-70"
+              style={{ borderColor: "var(--border)", color: "var(--muted-foreground)" }}
+              title="Le bot répondra au prochain message visiteur"
+            >
+              <Bot size={12} /> Réactiver le bot
+            </button>
+          )}
           {conversation.status === "closed" ? (
             <button
               onClick={() => setStatus("open")}

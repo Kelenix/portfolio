@@ -9,6 +9,7 @@ const replySchema = z.object({
 
 const patchSchema = z.object({
   status: z.enum(["open", "closed"]).optional(),
+  mode: z.enum(["bot", "wait_human", "human", "closed"]).optional(),
   markRead: z.boolean().optional(),
 });
 
@@ -129,10 +130,13 @@ export async function PATCH(
     });
   }
 
-  if (parsed.data.status) {
+  if (parsed.data.status || parsed.data.mode) {
     await prisma.chatConversation.update({
       where: { id },
-      data: { status: parsed.data.status },
+      data: {
+        ...(parsed.data.status ? { status: parsed.data.status } : {}),
+        ...(parsed.data.mode ? { mode: parsed.data.mode } : {}),
+      },
     });
   }
 
