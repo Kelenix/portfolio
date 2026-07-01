@@ -258,6 +258,7 @@ Next.js 16 a renommé le fichier `middleware.ts` en `proxy.ts`. C'est pourquoi l
 
 ### `params` est une `Promise`
 
+
 En Next.js 16, les params dynamiques sont des promesses :
 
 ```ts
