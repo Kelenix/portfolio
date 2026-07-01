@@ -16,6 +16,7 @@ import {
   PanelBottom,
   Smartphone,
   ShieldCheck,
+  MessageCircle,
 } from "lucide-react";
 
 const navItems = [
@@ -28,6 +29,7 @@ const navItems = [
   { href: "/admin/social", label: "Réseaux", icon: Share2 },
   { href: "/admin/footer", label: "Footer", icon: PanelBottom },
   { href: "/admin/messages", label: "Messages", icon: MessageSquare },
+  { href: "/admin/chat", label: "Chat", icon: MessageCircle },
   { href: "/admin/audit", label: "Journal", icon: ShieldCheck },
   { href: "/admin/settings", label: "Paramètres", icon: Settings },
 ];

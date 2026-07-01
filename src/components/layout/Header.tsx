@@ -4,8 +4,9 @@ import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
-import { Menu, X } from "lucide-react";
+import { Menu, MessageCircle, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { OPEN_CHAT_EVENT } from "@/components/chat/ChatWidget";
 
 interface HeaderProps {
   locale: string;
@@ -24,6 +25,13 @@ export function Header({ locale }: HeaderProps) {
   }, []);
 
   const isActive = (href: string) => pathname === href;
+
+  const openChat = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event(OPEN_CHAT_EVENT));
+    }
+    setMenuOpen(false);
+  };
 
   return (
     <header
@@ -54,6 +62,15 @@ export function Header({ locale }: HeaderProps) {
           >
             {t("blog")}
           </Link>
+          <button
+            type="button"
+            onClick={openChat}
+            className="flex items-center gap-1.5 text-sm transition-opacity hover:opacity-70"
+            style={{ color: "var(--muted-foreground)" }}
+          >
+            <MessageCircle size={14} strokeWidth={1.5} />
+            {t("chat")}
+          </button>
           <LanguageSwitcher />
           <ThemeToggle />
         </nav>
@@ -82,6 +99,15 @@ export function Header({ locale }: HeaderProps) {
           >
             {t("blog")}
           </Link>
+          <button
+            type="button"
+            onClick={openChat}
+            className="flex items-center gap-2 text-sm py-2 text-left"
+            style={{ color: "var(--muted-foreground)" }}
+          >
+            <MessageCircle size={14} strokeWidth={1.5} />
+            {t("chat")}
+          </button>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
             <ThemeToggle />

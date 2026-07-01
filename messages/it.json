@@ -1,7 +1,23 @@
 {
   "nav": {
     "blog": "Blog",
-    "admin": "Admin"
+    "admin": "Admin",
+    "chat": "Chat"
+  },
+  "chat": {
+    "openLabel": "Apri chat",
+    "title": "Scrivi a Lionel",
+    "subtitle": "Risposta di solito entro 24 h.",
+    "namePlaceholder": "Il tuo nome (facoltativo)",
+    "emailPlaceholder": "La tua email (facoltativa)",
+    "inputPlaceholder": "Scrivi il tuo messaggio…",
+    "send": "Invia",
+    "empty": "Ciao! Scrivimi e ti rispondo appena posso.",
+    "you": "Tu",
+    "me": "Lionel",
+    "error": "Invio non riuscito. Riprova.",
+    "rateLimited": "Stai inviando troppo velocemente. Attendi qualche minuto.",
+    "close": "Chiudi"
   },
   "hero": {
     "role": "Ingegnere Fullstack & Creatore",

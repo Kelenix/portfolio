@@ -1,0 +1,306 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import { MessageCircle, X, Send, Loader2 } from "lucide-react";
+
+type Message = {
+  id: string;
+  sender: "visitor" | "admin";
+  body: string;
+  createdAt: string;
+};
+
+const POLL_INTERVAL_MS = 3000;
+
+export const OPEN_CHAT_EVENT = "chat:open";
+
+export function ChatWidget() {
+  const t = useTranslations("chat");
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [body, setBody] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hasUnread, setHasUnread] = useState(false);
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const lastSeenRef = useRef<number>(0);
+
+  const openWidget = () => {
+    setOpen(true);
+    setHasUnread(false);
+  };
+
+  useEffect(() => {
+    const onOpen = () => openWidget();
+    window.addEventListener(OPEN_CHAT_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_CHAT_EVENT, onOpen);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const poll = async () => {
+      try {
+        const url = lastSeenRef.current
+          ? `/api/chat/poll?since=${lastSeenRef.current}`
+          : "/api/chat/poll";
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) return;
+        const data = (await res.json()) as { messages: Message[] };
+        if (cancelled || data.messages.length === 0) return;
+        const lastCreated = data.messages.at(-1)?.createdAt;
+        if (lastCreated) lastSeenRef.current = new Date(lastCreated).getTime();
+        setMessages((prev) => {
+          const known = new Set(prev.map((m) => m.id));
+          const fresh = data.messages.filter((m) => !known.has(m.id));
+          return fresh.length ? [...prev, ...fresh] : prev;
+        });
+        if (!open && data.messages.some((m) => m.sender === "admin")) {
+          setHasUnread(true);
+        }
+      } catch {
+        /* silent — polling retries */
+      }
+    };
+
+    poll();
+    const id = setInterval(poll, POLL_INTERVAL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (open && listRef.current) {
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    }
+  }, [open, messages.length]);
+
+  const send = async () => {
+    const trimmed = body.trim();
+    if (!trimmed || sending) return;
+    setSending(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/chat/message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          body: trimmed,
+          visitorName: name.trim() || null,
+          visitorEmail: email.trim() || null,
+        }),
+      });
+      if (res.status === 429) {
+        setError(t("rateLimited"));
+        return;
+      }
+      if (!res.ok) {
+        setError(t("error"));
+        return;
+      }
+      const data = (await res.json()) as { message: Message };
+      lastSeenRef.current = new Date(data.message.createdAt).getTime();
+      setMessages((prev) =>
+        prev.some((m) => m.id === data.message.id) ? prev : [...prev, data.message]
+      );
+      setBody("");
+    } catch {
+      setError(t("error"));
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  };
+
+  return (
+    <>
+      {!open && (
+        <button
+          type="button"
+          aria-label={t("openLabel")}
+          onClick={openWidget}
+          className="fixed bottom-5 right-5 z-40 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105"
+          style={{
+            background: "var(--foreground)",
+            color: "var(--background)",
+            border: "1px solid var(--border)",
+          }}
+        >
+          <MessageCircle size={20} strokeWidth={1.5} />
+          {hasUnread && (
+            <span
+              className="absolute top-0.5 right-0.5 w-2.5 h-2.5 rounded-full"
+              style={{ background: "#ef4444" }}
+              aria-hidden
+            />
+          )}
+        </button>
+      )}
+
+      {open && (
+        <div
+          className="fixed bottom-5 right-5 z-40 flex flex-col rounded-xl shadow-2xl overflow-hidden"
+          style={{
+            width: "min(360px, calc(100vw - 2.5rem))",
+            height: "min(560px, calc(100vh - 2.5rem))",
+            background: "var(--background)",
+            border: "1px solid var(--border)",
+          }}
+        >
+          <div
+            className="flex items-start justify-between gap-3 p-4 border-b"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <div className="min-w-0">
+              <p
+                className="text-sm font-mono font-bold truncate"
+                style={{ color: "var(--foreground)" }}
+              >
+                {t("title")}
+              </p>
+              <p
+                className="text-[11px] font-mono mt-0.5"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                {t("subtitle")}
+              </p>
+            </div>
+            <button
+              type="button"
+              aria-label={t("close")}
+              onClick={() => setOpen(false)}
+              style={{ color: "var(--muted-foreground)" }}
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          <div
+            ref={listRef}
+            className="flex-1 overflow-y-auto p-4 space-y-3"
+            style={{ background: "var(--muted)" }}
+          >
+            {messages.length === 0 && (
+              <p
+                className="text-xs text-center py-6"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                {t("empty")}
+              </p>
+            )}
+            {messages.map((m) => (
+              <div
+                key={m.id}
+                className={`flex flex-col ${m.sender === "visitor" ? "items-end" : "items-start"}`}
+              >
+                <span
+                  className="text-[10px] font-mono mb-0.5"
+                  style={{ color: "var(--muted-foreground)" }}
+                >
+                  {m.sender === "visitor" ? t("you") : t("me")}
+                </span>
+                <div
+                  className="max-w-[85%] px-3 py-2 rounded-lg text-sm whitespace-pre-wrap break-words"
+                  style={{
+                    background:
+                      m.sender === "visitor"
+                        ? "var(--foreground)"
+                        : "var(--background)",
+                    color:
+                      m.sender === "visitor"
+                        ? "var(--background)"
+                        : "var(--foreground)",
+                    border: "1px solid var(--border)",
+                  }}
+                >
+                  {m.body}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div
+            className="p-3 border-t space-y-2"
+            style={{ borderColor: "var(--border)", background: "var(--background)" }}
+          >
+            {messages.length === 0 && (
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={t("namePlaceholder")}
+                  className="px-2 py-1.5 text-xs rounded border outline-none"
+                  style={{
+                    background: "var(--muted)",
+                    borderColor: "var(--border)",
+                    color: "var(--foreground)",
+                  }}
+                />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t("emailPlaceholder")}
+                  className="px-2 py-1.5 text-xs rounded border outline-none"
+                  style={{
+                    background: "var(--muted)",
+                    borderColor: "var(--border)",
+                    color: "var(--foreground)",
+                  }}
+                />
+              </div>
+            )}
+
+            {error && (
+              <p className="text-[11px] text-red-500 font-mono">{error}</p>
+            )}
+
+            <div className="flex items-end gap-2">
+              <textarea
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                onKeyDown={handleKeyDown}
+                rows={2}
+                placeholder={t("inputPlaceholder")}
+                className="flex-1 px-2 py-1.5 text-sm rounded border outline-none resize-none"
+                style={{
+                  background: "var(--muted)",
+                  borderColor: "var(--border)",
+                  color: "var(--foreground)",
+                }}
+              />
+              <button
+                type="button"
+                onClick={send}
+                disabled={sending || !body.trim()}
+                aria-label={t("send")}
+                className="w-9 h-9 flex items-center justify-center rounded transition-opacity disabled:opacity-40"
+                style={{
+                  background: "var(--foreground)",
+                  color: "var(--background)",
+                }}
+              >
+                {sending ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <Send size={14} />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

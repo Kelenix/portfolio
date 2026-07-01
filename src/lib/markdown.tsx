@@ -6,7 +6,10 @@ type Block =
   | { type: "quote"; lines: string[] }
   | { type: "code"; lang: string; text: string }
   | { type: "ul"; items: string[] }
-  | { type: "ol"; items: string[] };
+  | { type: "ol"; items: string[] }
+  | { type: "image"; alt: string; url: string };
+
+const STANDALONE_IMAGE = /^\s*!\[([^\]]*)\]\(([^)\s]+)\)\s*$/;
 
 function parseBlocks(source: string): Block[] {
   const lines = source.replace(/\r\n?/g, "\n").split("\n");
@@ -35,6 +38,17 @@ function parseBlocks(source: string): Block[] {
         type: "heading",
         level: heading[1]!.length as 1 | 2 | 3,
         text: heading[2]!.trim(),
+      });
+      i += 1;
+      continue;
+    }
+
+    const standaloneImage = STANDALONE_IMAGE.exec(line);
+    if (standaloneImage) {
+      blocks.push({
+        type: "image",
+        alt: standaloneImage[1]!,
+        url: standaloneImage[2]!,
       });
       i += 1;
       continue;
@@ -83,7 +97,8 @@ function parseBlocks(source: string): Block[] {
       !/^>\s?/.test(lines[i]!) &&
       !/^\s*[-*]\s+/.test(lines[i]!) &&
       !/^\s*\d+\.\s+/.test(lines[i]!) &&
-      !/^```/.test(lines[i]!)
+      !/^```/.test(lines[i]!) &&
+      !STANDALONE_IMAGE.test(lines[i]!)
     ) {
       paragraph.push(lines[i]!);
       i += 1;
@@ -95,6 +110,7 @@ function parseBlocks(source: string): Block[] {
 }
 
 const INLINE_TOKENS = [
+  { regex: /!\[([^\]]*)\]\(([^)\s]+)\)/, tag: "image" as const },
   { regex: /\*\*([^*\n]+)\*\*/, tag: "strong" as const },
   { regex: /`([^`\n]+)`/, tag: "code" as const },
   { regex: /\*([^*\n]+)\*/, tag: "em" as const },
@@ -110,7 +126,7 @@ function renderInline(text: string, keyPrefix: string): ReactNode[] {
   while (remaining.length > 0) {
     let best: {
       match: RegExpExecArray;
-      tag: "strong" | "em" | "code" | "link";
+      tag: "strong" | "em" | "code" | "link" | "image";
     } | null = null;
 
     for (const { regex, tag } of INLINE_TOKENS) {
@@ -165,6 +181,18 @@ function renderInline(text: string, keyPrefix: string): ReactNode[] {
         >
           {best.match[1]}
         </a>
+      );
+    } else if (best.tag === "image") {
+      nodes.push(
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          key={k}
+          src={best.match[2]}
+          alt={best.match[1] || ""}
+          loading="lazy"
+          decoding="async"
+          className="inline-block max-w-full h-auto align-middle rounded"
+        />
       );
     }
 
@@ -254,18 +282,42 @@ function renderBlock(block: Block, key: number): ReactNode {
     );
   }
 
+  if (block.type === "ol") {
+    return (
+      <ol
+        key={key}
+        className="my-4 pl-5 list-decimal space-y-1.5 text-sm"
+        style={{ color: "var(--foreground)" }}
+      >
+        {block.items.map((it, li) => (
+          <li key={li} className="leading-relaxed">
+            {renderInline(it, `ol-${key}-${li}`)}
+          </li>
+        ))}
+      </ol>
+    );
+  }
+
   return (
-    <ol
-      key={key}
-      className="my-4 pl-5 list-decimal space-y-1.5 text-sm"
-      style={{ color: "var(--foreground)" }}
-    >
-      {block.items.map((it, li) => (
-        <li key={li} className="leading-relaxed">
-          {renderInline(it, `ol-${key}-${li}`)}
-        </li>
-      ))}
-    </ol>
+    <figure key={key} className="my-6">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={block.url}
+        alt={block.alt || ""}
+        loading="lazy"
+        decoding="async"
+        className="w-full h-auto rounded-lg border"
+        style={{ borderColor: "var(--border)" }}
+      />
+      {block.alt ? (
+        <figcaption
+          className="mt-2 text-xs font-mono text-center"
+          style={{ color: "var(--muted-foreground)" }}
+        >
+          {block.alt}
+        </figcaption>
+      ) : null}
+    </figure>
   );
 }
 
@@ -286,10 +338,11 @@ export function stripMarkdown(source: string): string {
     .replace(/^\s*>\s?/gm, "")
     .replace(/^\s*[-*]\s+/gm, "")
     .replace(/^\s*\d+\.\s+/gm, "")
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .replace(/\*\*([^*]+)\*\*/g, "$1")
     .replace(/\*([^*]+)\*/g, "$1")
     .replace(/_([^_]+)_/g, "$1")
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .replace(/\s+/g, " ")
     .trim();
 }

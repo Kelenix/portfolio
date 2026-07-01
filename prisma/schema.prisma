@@ -31,6 +31,36 @@ model AuditLog {
   @@index([action])
 }
 
+model ChatConversation {
+  id            String   @id @default(cuid())
+  visitorId     String   @unique
+  visitorName   String?
+  visitorEmail  String?
+  status        String   @default("open")
+  lastMessageAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  messages      ChatMessage[]
+
+  @@index([lastMessageAt])
+  @@index([status])
+}
+
+model ChatMessage {
+  id             String   @id @default(cuid())
+  conversationId String
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         String
+  body           String   @db.Text
+  readByAdmin    Boolean  @default(false)
+  readByVisitor  Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  @@index([conversationId, createdAt])
+  @@index([readByAdmin])
+}
+
 model Project {
   id          String   @id @default(cuid())
   titleFr     String

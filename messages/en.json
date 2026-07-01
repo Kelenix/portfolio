@@ -1,7 +1,23 @@
 {
   "nav": {
     "blog": "Blog",
-    "admin": "Admin"
+    "admin": "Admin",
+    "chat": "Chat"
+  },
+  "chat": {
+    "openLabel": "Open chat",
+    "title": "Chat with Lionel",
+    "subtitle": "Usually replies within 24 h.",
+    "namePlaceholder": "Your first name (optional)",
+    "emailPlaceholder": "Your email (optional)",
+    "inputPlaceholder": "Type your message…",
+    "send": "Send",
+    "empty": "Hi there! Drop a message and I'll get back to you.",
+    "you": "You",
+    "me": "Lionel",
+    "error": "Could not send. Please retry.",
+    "rateLimited": "You're sending too fast. Wait a few minutes.",
+    "close": "Close"
   },
   "hero": {
     "role": "Fullstack Engineer & Creator",

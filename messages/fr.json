@@ -1,7 +1,23 @@
 {
   "nav": {
     "blog": "Blog",
-    "admin": "Admin"
+    "admin": "Admin",
+    "chat": "Chat"
+  },
+  "chat": {
+    "openLabel": "Ouvrir le chat",
+    "title": "Discuter avec Lionel",
+    "subtitle": "Réponse rapide, en général sous 24 h.",
+    "namePlaceholder": "Votre prénom (facultatif)",
+    "emailPlaceholder": "Votre email (facultatif)",
+    "inputPlaceholder": "Écrivez votre message…",
+    "send": "Envoyer",
+    "empty": "Bonjour ! Écrivez-moi et je vous réponds dès que possible.",
+    "you": "Vous",
+    "me": "Lionel",
+    "error": "Envoi impossible. Réessayez.",
+    "rateLimited": "Vous envoyez trop vite. Attendez quelques minutes.",
+    "close": "Fermer"
   },
   "hero": {
     "role": "Développeur Fullstack & Créateur",

@@ -174,6 +174,7 @@ Le rendu est fait par un parseur maison (aucune dépendance externe, aucun `dang
 | Liste à puces | `- item` ou `* item` |
 | Liste ordonnée | `1. item` |
 | Bloc de code | Trois backticks ` ``` ` (optionnellement suivis d'un nom de langage) puis fermé par ` ``` ` |
+| Image | `![légende](url)` — sur sa propre ligne pour un rendu en `<figure>` avec légende ; inline sinon |
 
 | Inline | Notation |
 |---|---|
@@ -183,6 +184,14 @@ Le rendu est fait par un parseur maison (aucune dépendance externe, aucun `dang
 | Lien | `[libellé](https://…)` — les URLs externes s'ouvrent dans un nouvel onglet automatiquement |
 
 Le rendu respecte le thème clair / sombre via les variables CSS (`var(--foreground)`, `var(--muted)`, `var(--accent)`, `var(--border)`). Un pense-bête est disponible dans le formulaire admin (bloc "Syntaxe Markdown supportée").
+
+### Images
+
+Le formulaire admin propose un bouton **Insérer une image** à côté de chaque textarea de contenu. Le fichier sélectionné (PNG, JPEG, WebP ou GIF, 5 Mo max) est uploadé sur le bucket Supabase `avatars` dans le sous-dossier `blog/`. La syntaxe `![légende](url)` est insérée automatiquement à l'emplacement du curseur.
+
+- Une image seule sur une ligne est rendue en `<figure>` centrée avec sa légende si présente.
+- La même syntaxe placée au milieu d'un paragraphe s'affiche en flux inline.
+- Aucune dépendance externe : le rendu utilise `<img>` avec `loading="lazy"` (compat SSR + accessibilité).
 
 ## Réseaux sociaux
 
@@ -212,6 +221,39 @@ Gère les deux colonnes du pied de page : **Formations & Articles** et **Produit
 | Colonne | `Formations & Articles` ou `Produits` |
 | Ordre | Tri dans la colonne |
 | Publié | Toggle |
+
+## Chat
+
+`/admin/chat`
+
+Boîte de réception des conversations lancées depuis le widget de chat public (bouton **Chat** dans la Navbar du site).
+
+### Liste des conversations
+
+Chaque conversation affiche : identité du visiteur (nom / email s'ils ont été renseignés, sinon un identifiant court), aperçu du dernier message, compteur de messages non lus, date du dernier échange, statut `ouvert` / `fermé`. La liste se rafraîchit automatiquement toutes les 5 secondes.
+
+### Vue conversation
+
+Cliquer sur une conversation pour voir l'historique complet. Actions disponibles :
+
+| Action | Effet |
+|---|---|
+| **Répondre** | Envoie un message signé "Vous" ; le visiteur le reçoit dans son widget (polling 3 s). |
+| **Fermer** | Passe la conversation en statut `closed`. Le visiteur peut toujours écrire — cela rouvre automatiquement la conversation. |
+| **Rouvrir** | Repasse en `open`. |
+| **Supprimer** | Efface définitivement la conversation et tous ses messages. Irréversible. |
+
+Le compteur de non-lus se remet à zéro dès que la page est ouverte.
+
+### Fonctionnement temps réel
+
+- Côté visiteur : polling toutes les 3 s tant que le widget est ouvert. Pas de connexion permanente, aucun impact sur les visiteurs qui ne l'utilisent pas.
+- Côté admin : polling toutes les 2,5 s sur la conversation active, 5 s sur la liste.
+- L'architecture est pensée pour brancher Supabase Realtime ou Pusher plus tard sans toucher au frontend (les endpoints `/api/chat/poll` et `/api/admin/chat/[id]` restent stables).
+
+### Notifications Telegram
+
+Si `TELEGRAM_BOT_TOKEN` et `TELEGRAM_CHAT_ID` sont configurés (voir [docs/DEPLOY.md §7](DEPLOY.md#7-notifications-telegram-chat)), chaque nouveau message visiteur déclenche une notification Telegram avec un deep-link direct vers la conversation. Absence des vars → chat 100% fonctionnel, aucune notification envoyée, aucun avertissement bloquant.
 
 ## Messages
 

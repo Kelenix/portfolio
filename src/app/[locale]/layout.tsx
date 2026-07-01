@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 import {
   type AppLocale,
   OG_LOCALES,
@@ -134,6 +135,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <Header locale={locale} />
           <main className="flex-1">{children}</main>
           <Footer />
+          <ChatWidget />
         </div>
       </ThemeProvider>
     </NextIntlClientProvider>

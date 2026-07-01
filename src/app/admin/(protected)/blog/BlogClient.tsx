@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Edit2, Trash2, Eye, EyeOff, Loader2, X } from "lucide-react";
+import { useRef, useState } from "react";
+import { Plus, Edit2, Trash2, Eye, EyeOff, Loader2, X, Image as ImageIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -41,6 +41,9 @@ export function BlogClient({ initialPosts }: { initialPosts: BlogPost[] }) {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("fr");
+  const [uploadingTab, setUploadingTab] = useState<Tab | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const pendingTabRef = useRef<Tab | null>(null);
   const { toast } = useToast();
 
   const {
@@ -135,6 +138,71 @@ export function BlogClient({ initialPosts }: { initialPosts: BlogPost[] }) {
   const tabs: Tab[] = ["fr", "en", "it"];
   const fieldName = (prefix: string, tab: Tab) =>
     `${prefix}${tab.charAt(0).toUpperCase() + tab.slice(1)}` as keyof FormData;
+
+  const pickImage = (tab: Tab) => {
+    pendingTabRef.current = tab;
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+      fileInputRef.current.click();
+    }
+  };
+
+  const insertAtCursor = (tab: Tab, snippet: string) => {
+    const field = fieldName("content", tab);
+    const textarea = document.getElementById(`content-${tab}`) as HTMLTextAreaElement | null;
+    if (!textarea) {
+      setValue(field, `${(document.getElementById(`content-${tab}`) as HTMLTextAreaElement | null)?.value ?? ""}${snippet}`);
+      return;
+    }
+    const start = textarea.selectionStart ?? textarea.value.length;
+    const end = textarea.selectionEnd ?? textarea.value.length;
+    const before = textarea.value.slice(0, start);
+    const after = textarea.value.slice(end);
+    const needsLeadingBreak = before.length > 0 && !before.endsWith("\n\n");
+    const prefix = needsLeadingBreak ? (before.endsWith("\n") ? "\n" : "\n\n") : "";
+    const suffix = after.startsWith("\n") ? "\n" : "\n\n";
+    const finalSnippet = `${prefix}${snippet}${suffix}`;
+    const next = before + finalSnippet + after;
+    setValue(field, next, { shouldDirty: true });
+    requestAnimationFrame(() => {
+      textarea.focus();
+      const caret = (before + finalSnippet).length;
+      textarea.setSelectionRange(caret, caret);
+    });
+  };
+
+  const handleFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    const tab = pendingTabRef.current;
+    if (!file || !tab) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast("error", "Format non supporté");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast("error", "Image trop lourde (max 5 Mo)");
+      return;
+    }
+
+    setUploadingTab(tab);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", "blog");
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error();
+      const { url } = (await res.json()) as { url: string };
+      const alt = file.name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
+      insertAtCursor(tab, `![${alt}](${url})`);
+      toast("success", "Image insérée");
+    } catch {
+      toast("error", "Échec de l'upload");
+    } finally {
+      setUploadingTab(null);
+      pendingTabRef.current = null;
+    }
+  };
 
   return (
     <div>
@@ -252,19 +320,48 @@ export function BlogClient({ initialPosts }: { initialPosts: BlogPost[] }) {
                     )}
                   </div>
                   <div>
-                    <label className="block text-xs font-mono mb-1" style={{ color: "var(--muted-foreground)" }}>
-                      Contenu ({tab.toUpperCase()})
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-mono" style={{ color: "var(--muted-foreground)" }}>
+                        Contenu ({tab.toUpperCase()})
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => pickImage(tab)}
+                        disabled={uploadingTab !== null}
+                        className="flex items-center gap-1.5 px-2 py-1 text-[11px] font-mono rounded border transition-all disabled:opacity-50"
+                        style={{
+                          borderColor: "var(--border)",
+                          color: "var(--muted-foreground)",
+                          background: "var(--background)",
+                        }}
+                      >
+                        {uploadingTab === tab ? (
+                          <Loader2 size={11} className="animate-spin" />
+                        ) : (
+                          <ImageIcon size={11} />
+                        )}
+                        {uploadingTab === tab ? "Upload…" : "Insérer une image"}
+                      </button>
+                    </div>
                     <textarea
+                      id={`content-${tab}`}
                       {...register(fieldName("content", tab))}
                       rows={12}
                       className="w-full px-3 py-2 text-sm rounded-lg border outline-none resize-y font-mono"
                       style={{ background: "var(--muted)", borderColor: "var(--border)", color: "var(--foreground)" }}
-                      placeholder={"# Titre\n## Sous-titre\n\nParagraphe avec **gras**, *italique* et `code`.\n\n> Citation\n\n- item de liste\n- autre item\n\n```js\nconst x = 42;\n```"}
+                      placeholder={"# Titre\n## Sous-titre\n\nParagraphe avec **gras**, *italique* et `code`.\n\n> Citation\n\n- item de liste\n- autre item\n\n![légende](https://…) pour une image\n\n```js\nconst x = 42;\n```"}
                     />
                   </div>
                 </div>
               ))}
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                className="hidden"
+                onChange={handleFileSelected}
+              />
 
               <details
                 className="rounded-lg border text-xs"
@@ -285,6 +382,7 @@ export function BlogClient({ initialPosts }: { initialPosts: BlogPost[] }) {
                   <div><code>[texte](https://…)</code></div>
                   <div><code>&gt; citation</code> (une ou plusieurs lignes)</div>
                   <div><code>- item</code> ou <code>1. item</code></div>
+                  <div><code>![légende](url)</code> pour une image (ou utiliser le bouton ci-dessus)</div>
                   <div><code>```lang</code> … <code>```</code> pour un bloc de code</div>
                   <div>Ligne vide = nouveau paragraphe</div>
                 </div>

@@ -121,6 +121,10 @@ SUPABASE_URL=https://abcxyz.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...
 
 NEXT_PUBLIC_SITE_URL=https://ton-domaine.com       # optionnel mais recommandé
+
+# Notifications chat (facultatif)
+TELEGRAM_BOT_TOKEN=                                 # voir §7 ci-dessous
+TELEGRAM_CHAT_ID=
 ```
 
 ### Pièges fréquents
@@ -145,6 +149,12 @@ Le projet utilise un bucket Supabase appelé `avatars` pour stocker :
 | Public | ✓ |
 | File size limit | 5 MB |
 | Allowed MIME types | `image/png, image/jpeg, image/webp, image/gif` |
+
+Organisation interne du bucket :
+
+- `avatar.jpg` — avatar de profil (upsert)
+- `mobile-apps/{hex}.png` — icônes d'apps
+- `blog/{hex}.{ext}` — images insérées dans les articles
 
 ### Création via API (alternative)
 
@@ -288,3 +298,49 @@ Vérifier que les 9 variables sont définies dans **Production** (la coche pour 
 ### Le site affiche "Votre Nom" en production
 
 Le profil n'a pas été personnalisé. Aller dans `/admin/settings` et remplir les champs.
+
+## 7. Notifications Telegram (chat)
+
+Le widget de chat fonctionne sans notification — les messages sont stockés en base et visibles dans `/admin/chat`. Pour être **prévenu en temps réel** quand un visiteur écrit, on branche un bot Telegram gratuit.
+
+### 7.1 Créer le bot
+
+1. Ouvrir Telegram et discuter avec [@BotFather](https://t.me/BotFather).
+2. Envoyer `/newbot`.
+3. Choisir un nom d'affichage (ex : "Portfolio Chat") puis un username unique se terminant par `bot` (ex : `lionel_portfolio_bot`).
+4. @BotFather renvoie un token de la forme `123456789:ABCdefGhI…`. **C'est `TELEGRAM_BOT_TOKEN`.**
+
+### 7.2 Récupérer ton chat ID
+
+1. Chercher ton propre bot par son username, ouvrir la conversation et envoyer `/start`.
+2. Dans un navigateur, ouvrir :
+   ```
+   https://api.telegram.org/bot<TON_TOKEN>/getUpdates
+   ```
+3. Chercher dans la réponse JSON un bloc `"chat":{"id":<nombre>,…}`. **Ce nombre est `TELEGRAM_CHAT_ID`.**
+
+> Pour recevoir dans un **groupe** au lieu d'un DM : ajouter le bot au groupe, envoyer un message dans le groupe, relancer `getUpdates`. L'ID du groupe est négatif (ex : `-123456789`).
+
+### 7.3 Ajouter les vars sur Vercel
+
+**Vercel → Project Settings → Environment Variables** :
+
+```
+TELEGRAM_BOT_TOKEN=123456789:ABCdef…
+TELEGRAM_CHAT_ID=987654321
+```
+
+Redéployer. À chaque nouveau message visiteur, tu reçois sur Telegram :
+
+```
+Nouveau message chat
+Alice · alice@example.com
+
+Bonjour, j'aimerais discuter d'un projet…
+
+Ouvrir la conversation  ← deep-link vers /admin/chat/<id>
+```
+
+### 7.4 Désactiver / retirer
+
+Suffit de vider (ou supprimer) les deux variables et redéployer. Le chat continue de fonctionner mais aucune notification n'est envoyée. Le code garde volontairement l'architecture pluggable ([`src/lib/notifications/channel.ts`](../src/lib/notifications/channel.ts)) : on peut brancher un canal WhatsApp, email, ou Slack en ajoutant un fichier dans `src/lib/notifications/` et en l'exposant dans `index.ts`.
