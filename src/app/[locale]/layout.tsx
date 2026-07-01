@@ -123,7 +123,26 @@ export default async function LocaleLayout({ children, params }: Props) {
     notFound();
   }
 
-  const messages = await getMessages();
+  const [messages, chatProfile] = await Promise.all([
+    getMessages(),
+    (async () => {
+      try {
+        const p = await prisma.profile.findFirst({ where: { id: "default" } });
+        return {
+          avatarUrl: p?.photoUrl ?? null,
+          name: p
+            ? pickLocaleField(locale as AppLocale, {
+                fr: p.nameFr,
+                en: p.nameEn,
+                it: p.nameIt,
+              })
+            : null,
+        };
+      } catch {
+        return { avatarUrl: null, name: null };
+      }
+    })(),
+  ]);
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
@@ -135,7 +154,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <Header locale={locale} />
           <main className="flex-1">{children}</main>
           <Footer />
-          <ChatWidget />
+          <ChatWidget avatarUrl={chatProfile.avatarUrl} adminName={chatProfile.name} />
         </div>
       </ThemeProvider>
     </NextIntlClientProvider>

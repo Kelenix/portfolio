@@ -222,7 +222,7 @@ export function ChatConversationClient({
         {messages.map((m) => (
           <div
             key={m.id}
-            className={`flex flex-col ${m.sender === "admin" ? "items-end" : "items-start"}`}
+            className={`flex flex-col max-w-[75%] ${m.sender === "admin" ? "items-end ml-auto" : "items-start mr-auto"}`}
           >
             <span
               className="text-[10px] font-mono mb-0.5"
@@ -231,7 +231,7 @@ export function ChatConversationClient({
               {m.sender === "admin" ? "Vous" : identity} · {formatTime(m.createdAt)}
             </span>
             <div
-              className="max-w-[75%] px-3 py-2 rounded-lg text-sm whitespace-pre-wrap break-words"
+              className="px-3.5 py-2 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap"
               style={{
                 background:
                   m.sender === "admin" ? "var(--foreground)" : "var(--muted)",
@@ -240,6 +240,8 @@ export function ChatConversationClient({
                     ? "var(--background)"
                     : "var(--foreground)",
                 border: "1px solid var(--border)",
+                overflowWrap: "anywhere",
+                wordBreak: "normal",
               }}
             >
               {m.body}

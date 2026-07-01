@@ -6,7 +6,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { Menu, MessageCircle, X } from "lucide-react";
 import { useState, useEffect } from "react";
-import { OPEN_CHAT_EVENT } from "@/components/chat/ChatWidget";
+import { OPEN_CHAT_EVENT, UNREAD_CHAT_EVENT } from "@/components/chat/ChatWidget";
 
 interface HeaderProps {
   locale: string;
@@ -17,11 +17,21 @@ export function Header({ locale }: HeaderProps) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [chatUnread, setChatUnread] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ count: number }>).detail;
+      setChatUnread(detail?.count ?? 0);
+    };
+    window.addEventListener(UNREAD_CHAT_EVENT, handler);
+    return () => window.removeEventListener(UNREAD_CHAT_EVENT, handler);
   }, []);
 
   const isActive = (href: string) => pathname === href;
@@ -65,11 +75,20 @@ export function Header({ locale }: HeaderProps) {
           <button
             type="button"
             onClick={openChat}
-            className="flex items-center gap-1.5 text-sm transition-opacity hover:opacity-70"
+            className="relative flex items-center gap-1.5 text-sm transition-opacity hover:opacity-70"
             style={{ color: "var(--muted-foreground)" }}
           >
             <MessageCircle size={14} strokeWidth={1.5} />
             {t("chat")}
+            {chatUnread > 0 && (
+              <span
+                className="min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ml-0.5"
+                style={{ background: "#ef4444", color: "white" }}
+                aria-label={`${chatUnread} nouveau${chatUnread > 1 ? "x" : ""}`}
+              >
+                {chatUnread > 9 ? "9+" : chatUnread}
+              </span>
+            )}
           </button>
           <LanguageSwitcher />
           <ThemeToggle />
@@ -107,6 +126,14 @@ export function Header({ locale }: HeaderProps) {
           >
             <MessageCircle size={14} strokeWidth={1.5} />
             {t("chat")}
+            {chatUnread > 0 && (
+              <span
+                className="min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ml-1"
+                style={{ background: "#ef4444", color: "white" }}
+              >
+                {chatUnread > 9 ? "9+" : chatUnread}
+              </span>
+            )}
           </button>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />

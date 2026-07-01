@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { MessageCircle, X, Send, Loader2 } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, User } from "lucide-react";
 
 type Message = {
   id: string;
@@ -14,8 +14,22 @@ type Message = {
 const POLL_INTERVAL_MS = 3000;
 
 export const OPEN_CHAT_EVENT = "chat:open";
+export const UNREAD_CHAT_EVENT = "chat:unread";
 
-export function ChatWidget() {
+function dispatchUnread(count: number) {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent(UNREAD_CHAT_EVENT, { detail: { count } })
+    );
+  }
+}
+
+type Props = {
+  avatarUrl?: string | null;
+  adminName?: string | null;
+};
+
+export function ChatWidget({ avatarUrl, adminName }: Props = {}) {
   const t = useTranslations("chat");
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -24,13 +38,14 @@ export function ChatWidget() {
   const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasUnread, setHasUnread] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const listRef = useRef<HTMLDivElement | null>(null);
   const lastSeenRef = useRef<number>(0);
 
   const openWidget = () => {
     setOpen(true);
-    setHasUnread(false);
+    setUnreadCount(0);
+    dispatchUnread(0);
   };
 
   useEffect(() => {
@@ -44,23 +59,28 @@ export function ChatWidget() {
 
     const poll = async () => {
       try {
-        const url = lastSeenRef.current
-          ? `/api/chat/poll?since=${lastSeenRef.current}`
-          : "/api/chat/poll";
+        const params = new URLSearchParams();
+        if (lastSeenRef.current) params.set("since", String(lastSeenRef.current));
+        if (open) params.set("markRead", "1");
+        const url = `/api/chat/poll${params.toString() ? "?" + params : ""}`;
         const res = await fetch(url, { cache: "no-store" });
         if (!res.ok) return;
-        const data = (await res.json()) as { messages: Message[] };
-        if (cancelled || data.messages.length === 0) return;
-        const lastCreated = data.messages.at(-1)?.createdAt;
-        if (lastCreated) lastSeenRef.current = new Date(lastCreated).getTime();
-        setMessages((prev) => {
-          const known = new Set(prev.map((m) => m.id));
-          const fresh = data.messages.filter((m) => !known.has(m.id));
-          return fresh.length ? [...prev, ...fresh] : prev;
-        });
-        if (!open && data.messages.some((m) => m.sender === "admin")) {
-          setHasUnread(true);
+        const data = (await res.json()) as {
+          messages: Message[];
+          unreadCount: number;
+        };
+        if (cancelled) return;
+        if (data.messages.length > 0) {
+          const lastCreated = data.messages.at(-1)?.createdAt;
+          if (lastCreated) lastSeenRef.current = new Date(lastCreated).getTime();
+          setMessages((prev) => {
+            const known = new Set(prev.map((m) => m.id));
+            const fresh = data.messages.filter((m) => !known.has(m.id));
+            return fresh.length ? [...prev, ...fresh] : prev;
+          });
         }
+        setUnreadCount(data.unreadCount);
+        dispatchUnread(data.unreadCount);
       } catch {
         /* silent — polling retries */
       }
@@ -138,12 +158,14 @@ export function ChatWidget() {
           }}
         >
           <MessageCircle size={20} strokeWidth={1.5} />
-          {hasUnread && (
+          {unreadCount > 0 && (
             <span
-              className="absolute top-0.5 right-0.5 w-2.5 h-2.5 rounded-full"
-              style={{ background: "#ef4444" }}
-              aria-hidden
-            />
+              className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center text-[10px] font-mono font-bold"
+              style={{ background: "#ef4444", color: "white" }}
+              aria-label={`${unreadCount} nouveau${unreadCount > 1 ? "x" : ""}`}
+            >
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
           )}
         </button>
       )}
@@ -162,19 +184,51 @@ export function ChatWidget() {
             className="flex items-start justify-between gap-3 p-4 border-b"
             style={{ borderColor: "var(--border)" }}
           >
-            <div className="min-w-0">
-              <p
-                className="text-sm font-mono font-bold truncate"
-                style={{ color: "var(--foreground)" }}
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 flex items-center justify-center"
+                style={{
+                  background: "var(--muted)",
+                  border: "1px solid var(--border)",
+                }}
               >
-                {t("title")}
-              </p>
-              <p
-                className="text-[11px] font-mono mt-0.5"
-                style={{ color: "var(--muted-foreground)" }}
-              >
-                {t("subtitle")}
-              </p>
+                {avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={avatarUrl}
+                    alt={adminName ?? "Admin"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User
+                    size={16}
+                    strokeWidth={1.5}
+                    style={{ color: "var(--muted-foreground)" }}
+                  />
+                )}
+                <span
+                  className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2"
+                  style={{
+                    background: "#22c55e",
+                    borderColor: "var(--background)",
+                  }}
+                  aria-hidden
+                />
+              </div>
+              <div className="min-w-0">
+                <p
+                  className="text-sm font-mono font-bold truncate"
+                  style={{ color: "var(--foreground)" }}
+                >
+                  {t("title")}
+                </p>
+                <p
+                  className="text-[11px] font-mono mt-0.5"
+                  style={{ color: "var(--muted-foreground)" }}
+                >
+                  {t("subtitle")}
+                </p>
+              </div>
             </div>
             <button
               type="button"
@@ -199,35 +253,66 @@ export function ChatWidget() {
                 {t("empty")}
               </p>
             )}
-            {messages.map((m) => (
-              <div
-                key={m.id}
-                className={`flex flex-col ${m.sender === "visitor" ? "items-end" : "items-start"}`}
-              >
-                <span
-                  className="text-[10px] font-mono mb-0.5"
-                  style={{ color: "var(--muted-foreground)" }}
-                >
-                  {m.sender === "visitor" ? t("you") : t("me")}
-                </span>
+            {messages.map((m) => {
+              const isVisitor = m.sender === "visitor";
+              return (
                 <div
-                  className="max-w-[85%] px-3 py-2 rounded-lg text-sm whitespace-pre-wrap break-words"
-                  style={{
-                    background:
-                      m.sender === "visitor"
-                        ? "var(--foreground)"
-                        : "var(--background)",
-                    color:
-                      m.sender === "visitor"
-                        ? "var(--background)"
-                        : "var(--foreground)",
-                    border: "1px solid var(--border)",
-                  }}
+                  key={m.id}
+                  className={`flex gap-2 ${isVisitor ? "justify-end" : "justify-start"}`}
                 >
-                  {m.body}
+                  {!isVisitor && (
+                    <div
+                      className="w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center mt-4"
+                      style={{
+                        background: "var(--muted)",
+                        border: "1px solid var(--border)",
+                      }}
+                    >
+                      {avatarUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={avatarUrl}
+                          alt={adminName ?? "Admin"}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User
+                          size={12}
+                          strokeWidth={1.5}
+                          style={{ color: "var(--muted-foreground)" }}
+                        />
+                      )}
+                    </div>
+                  )}
+                  <div
+                    className={`flex flex-col max-w-[75%] ${isVisitor ? "items-end" : "items-start"}`}
+                  >
+                    <span
+                      className="text-[10px] font-mono mb-0.5"
+                      style={{ color: "var(--muted-foreground)" }}
+                    >
+                      {isVisitor ? t("you") : adminName ?? t("me")}
+                    </span>
+                    <div
+                      className="px-3.5 py-2 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere"
+                      style={{
+                        background: isVisitor
+                          ? "var(--foreground)"
+                          : "var(--background)",
+                        color: isVisitor
+                          ? "var(--background)"
+                          : "var(--foreground)",
+                        border: "1px solid var(--border)",
+                        overflowWrap: "anywhere",
+                        wordBreak: "normal",
+                      }}
+                    >
+                      {m.body}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div
