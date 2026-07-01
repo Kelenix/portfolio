@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { ToastContainer } from "@/components/admin/Toast";
 import { AdminSessionGuard } from "@/components/admin/AdminSessionGuard";
+import { IdleTimeout } from "@/components/admin/IdleTimeout";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import type { Metadata } from "next";
 
@@ -41,6 +42,7 @@ export default async function ProtectedAdminLayout({
         </div>
         <ToastContainer />
         <AdminSessionGuard />
+        <IdleTimeout />
       </div>
     </ThemeProvider>
   );

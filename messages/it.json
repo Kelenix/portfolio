@@ -12,9 +12,12 @@
     "emailPlaceholder": "La tua email (facoltativa)",
     "inputPlaceholder": "Scrivi il tuo messaggio…",
     "send": "Invia",
-    "empty": "Ciao! Scrivimi e ti rispondo appena posso.",
+    "empty": "Ciao! Un assistente può rispondere alle domande frequenti. Altrimenti, clicca su « Parla con un umano » per contattare Lionel.",
     "you": "Tu",
     "me": "Lionel",
+    "bot": "Assistente",
+    "talkToHuman": "Parla con un umano",
+    "waitingHuman": "Un umano ti risponderà a breve.",
     "error": "Invio non riuscito. Riprova.",
     "rateLimited": "Stai inviando troppo velocemente. Attendi qualche minuto.",
     "close": "Chiudi"

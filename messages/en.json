@@ -12,9 +12,12 @@
     "emailPlaceholder": "Your email (optional)",
     "inputPlaceholder": "Type your message…",
     "send": "Send",
-    "empty": "Hi there! Drop a message and I'll get back to you.",
+    "empty": "Hi! An assistant can answer common questions. Otherwise, click \"Talk to a human\" to reach Lionel directly.",
     "you": "You",
     "me": "Lionel",
+    "bot": "Assistant",
+    "talkToHuman": "Talk to a human",
+    "waitingHuman": "A human will reply soon.",
     "error": "Could not send. Please retry.",
     "rateLimited": "You're sending too fast. Wait a few minutes.",
     "close": "Close"

@@ -8,9 +8,17 @@ type ConversationSummary = {
   visitorName: string | null;
   visitorEmail: string | null;
   status: string;
+  mode: string;
   lastMessageAt: string;
   lastMessage: { sender: string; body: string; createdAt: string } | null;
   unread: number;
+};
+
+const MODE_BADGE: Record<string, { label: string; color: string }> = {
+  bot: { label: "Bot", color: "#6b7280" },
+  wait_human: { label: "Attente humain", color: "#f97316" },
+  human: { label: "Humain", color: "#22c55e" },
+  closed: { label: "Fermée", color: "var(--muted-foreground)" },
 };
 
 const POLL_MS = 5000;
@@ -108,17 +116,20 @@ export function ChatListClient({
                         {c.unread} non lu{c.unread > 1 ? "s" : ""}
                       </span>
                     )}
-                    {c.status === "closed" && (
-                      <span
-                        className="text-[10px] font-mono px-1.5 py-0.5 rounded border"
-                        style={{
-                          borderColor: "var(--border)",
-                          color: "var(--muted-foreground)",
-                        }}
-                      >
-                        fermée
-                      </span>
-                    )}
+                    {(() => {
+                      const meta = MODE_BADGE[c.mode] ?? MODE_BADGE.human;
+                      return (
+                        <span
+                          className="text-[10px] font-mono px-1.5 py-0.5 rounded border"
+                          style={{
+                            borderColor: `${meta.color}55`,
+                            color: meta.color,
+                          }}
+                        >
+                          {meta.label}
+                        </span>
+                      );
+                    })()}
                   </div>
                   <span
                     className="text-[11px] font-mono shrink-0"

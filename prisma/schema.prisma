@@ -37,6 +37,7 @@ model ChatConversation {
   visitorName   String?
   visitorEmail  String?
   status        String   @default("open")
+  mode          String   @default("human")
   lastMessageAt DateTime @default(now())
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -45,6 +46,24 @@ model ChatConversation {
 
   @@index([lastMessageAt])
   @@index([status])
+  @@index([mode])
+}
+
+model FaqEntry {
+  id          String   @id @default(cuid())
+  questionFr  String
+  questionEn  String
+  questionIt  String
+  answerFr    String   @db.Text
+  answerEn    String   @db.Text
+  answerIt    String   @db.Text
+  keywords    String   @default("")
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, order])
 }
 
 model ChatMessage {

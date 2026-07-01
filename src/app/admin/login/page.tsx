@@ -4,7 +4,7 @@ import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Loader2, Lock } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -25,6 +25,18 @@ function LoginForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
+
+  useEffect(() => {
+    if (expired) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("reason");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [expired]);
+
+  const clearError = () => {
+    if (error) setError("");
+  };
 
   const onSubmit = async (data: FormData) => {
     setError("");
@@ -53,7 +65,7 @@ function LoginForm() {
           Email ou username
         </label>
         <input
-          {...register("identifier")}
+          {...register("identifier", { onChange: clearError })}
           type="text"
           autoComplete="username"
           className="w-full px-3 py-2 text-sm rounded-lg border outline-none transition-colors focus:ring-1"
@@ -74,7 +86,7 @@ function LoginForm() {
           Mot de passe
         </label>
         <input
-          {...register("password")}
+          {...register("password", { onChange: clearError })}
           type="password"
           autoComplete="current-password"
           className="w-full px-3 py-2 text-sm rounded-lg border outline-none transition-colors"

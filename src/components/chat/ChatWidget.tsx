@@ -2,11 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { MessageCircle, X, Send, Loader2, User } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, User, Bot, UserPlus } from "lucide-react";
+
+type Sender = "visitor" | "admin" | "bot";
+type ConversationMode = "bot" | "wait_human" | "human" | "closed";
 
 type Message = {
   id: string;
-  sender: "visitor" | "admin";
+  sender: Sender;
   body: string;
   createdAt: string;
 };
@@ -39,6 +42,8 @@ export function ChatWidget({ avatarUrl, adminName }: Props = {}) {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [mode, setMode] = useState<ConversationMode>("bot");
+  const [escalating, setEscalating] = useState(false);
   const listRef = useRef<HTMLDivElement | null>(null);
   const lastSeenRef = useRef<number>(0);
 
@@ -68,8 +73,10 @@ export function ChatWidget({ avatarUrl, adminName }: Props = {}) {
         const data = (await res.json()) as {
           messages: Message[];
           unreadCount: number;
+          mode?: ConversationMode;
         };
         if (cancelled) return;
+        if (data.mode) setMode(data.mode);
         if (data.messages.length > 0) {
           const lastCreated = data.messages.at(-1)?.createdAt;
           if (lastCreated) lastSeenRef.current = new Date(lastCreated).getTime();
@@ -123,11 +130,22 @@ export function ChatWidget({ avatarUrl, adminName }: Props = {}) {
         setError(t("error"));
         return;
       }
-      const data = (await res.json()) as { message: Message };
-      lastSeenRef.current = new Date(data.message.createdAt).getTime();
-      setMessages((prev) =>
-        prev.some((m) => m.id === data.message.id) ? prev : [...prev, data.message]
-      );
+      const data = (await res.json()) as {
+        message: Message;
+        botReply: Message | null;
+        mode: ConversationMode;
+      };
+      setMode(data.mode);
+      const fresh: Message[] = [data.message];
+      if (data.botReply) fresh.push(data.botReply);
+      lastSeenRef.current = new Date(
+        fresh.at(-1)?.createdAt ?? data.message.createdAt
+      ).getTime();
+      setMessages((prev) => {
+        const known = new Set(prev.map((m) => m.id));
+        const added = fresh.filter((m) => !known.has(m.id));
+        return added.length ? [...prev, ...added] : prev;
+      });
       setBody("");
     } catch {
       setError(t("error"));
@@ -142,6 +160,22 @@ export function ChatWidget({ avatarUrl, adminName }: Props = {}) {
       send();
     }
   };
+
+  const escalate = async () => {
+    if (escalating) return;
+    setEscalating(true);
+    try {
+      const res = await fetch("/api/chat/escalate", { method: "POST" });
+      if (!res.ok) return;
+      setMode("wait_human");
+    } catch {
+      /* silent */
+    } finally {
+      setEscalating(false);
+    }
+  };
+
+  const canEscalate = mode === "bot" || mode === "closed";
 
   return (
     <>
@@ -255,6 +289,12 @@ export function ChatWidget({ avatarUrl, adminName }: Props = {}) {
             )}
             {messages.map((m) => {
               const isVisitor = m.sender === "visitor";
+              const isBot = m.sender === "bot";
+              const labelName = isVisitor
+                ? t("you")
+                : isBot
+                  ? t("bot")
+                  : adminName ?? t("me");
               return (
                 <div
                   key={m.id}
@@ -268,7 +308,13 @@ export function ChatWidget({ avatarUrl, adminName }: Props = {}) {
                         border: "1px solid var(--border)",
                       }}
                     >
-                      {avatarUrl ? (
+                      {isBot ? (
+                        <Bot
+                          size={12}
+                          strokeWidth={1.5}
+                          style={{ color: "var(--muted-foreground)" }}
+                        />
+                      ) : avatarUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={avatarUrl}
@@ -291,18 +337,22 @@ export function ChatWidget({ avatarUrl, adminName }: Props = {}) {
                       className="text-[10px] font-mono mb-0.5"
                       style={{ color: "var(--muted-foreground)" }}
                     >
-                      {isVisitor ? t("you") : adminName ?? t("me")}
+                      {labelName}
                     </span>
                     <div
-                      className="px-3.5 py-2 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere"
+                      className="px-3.5 py-2 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap"
                       style={{
                         background: isVisitor
                           ? "var(--foreground)"
-                          : "var(--background)",
+                          : isBot
+                            ? "var(--muted)"
+                            : "var(--background)",
                         color: isVisitor
                           ? "var(--background)"
                           : "var(--foreground)",
-                        border: "1px solid var(--border)",
+                        border: isBot
+                          ? "1px dashed var(--border)"
+                          : "1px solid var(--border)",
                         overflowWrap: "anywhere",
                         wordBreak: "normal",
                       }}
@@ -313,6 +363,15 @@ export function ChatWidget({ avatarUrl, adminName }: Props = {}) {
                 </div>
               );
             })}
+
+            {mode === "wait_human" && (
+              <p
+                className="text-[11px] font-mono text-center py-2"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                {t("waitingHuman")}
+              </p>
+            )}
           </div>
 
           <div
@@ -345,6 +404,23 @@ export function ChatWidget({ avatarUrl, adminName }: Props = {}) {
                   }}
                 />
               </div>
+            )}
+
+            {canEscalate && messages.length > 0 && (
+              <button
+                type="button"
+                onClick={escalate}
+                disabled={escalating}
+                className="flex items-center gap-1.5 text-[11px] font-mono transition-opacity hover:opacity-70 disabled:opacity-50"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                {escalating ? (
+                  <Loader2 size={11} className="animate-spin" />
+                ) : (
+                  <UserPlus size={11} strokeWidth={1.5} />
+                )}
+                {t("talkToHuman")}
+              </button>
             )}
 
             {error && (

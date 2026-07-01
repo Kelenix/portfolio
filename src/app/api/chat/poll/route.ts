@@ -61,6 +61,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     conversationId: conversation.id,
     status: conversation.status,
+    mode: conversation.mode,
     messages,
     unreadCount,
   });

@@ -31,7 +31,7 @@ Saisir **email ou username** + mot de passe. Les credentials proviennent des var
 |---|---|
 | Hash mot de passe | bcrypt (12 rounds) |
 | Rate-limit login | 5 tentatives / 15 min par IP → 15 min bloquée (retour `Identifiants incorrects` côté visiteur, `login.locked` dans le journal) |
-| Session | JWT signé (NextAuth v5), maxAge 5 min, refresh à chaque activité (updateAge 60 s) — équivalent à un idle-timeout de 5 min |
+| Session | JWT signé (NextAuth v5), maxAge 24 h. Idle-timeout de 5 min implémenté côté client (`IdleTimeout`) : signOut automatique après 5 min sans mouvement souris / touche / scroll / clic |
 | Session expirée | Redirection automatique vers `/admin/login?reason=expired` sur tout 401 admin |
 | Garde-fou API | Middleware (`src/proxy.ts`) rejette toute requête `/api/admin/*` sans jeton valide |
 | Journal | Table `AuditLog` — connexions, échecs, verrouillages — consultable dans **Journal** |
@@ -254,6 +254,54 @@ Le compteur de non-lus se remet à zéro dès que la page est ouverte.
 ### Notifications Telegram
 
 Si `TELEGRAM_BOT_TOKEN` et `TELEGRAM_CHAT_ID` sont configurés (voir [docs/DEPLOY.md §7](DEPLOY.md#7-notifications-telegram-chat)), chaque nouveau message visiteur déclenche une notification Telegram avec un deep-link direct vers la conversation. Absence des vars → chat 100% fonctionnel, aucune notification envoyée, aucun avertissement bloquant.
+
+## Chatbot FAQ
+
+`/admin/chatbot`
+
+Base de connaissances alimentant l'assistant automatique du chat public.
+
+### Machine à états d'une conversation
+
+| Mode | Sens | Transitions |
+|---|---|---|
+| `bot` | L'assistant tente de répondre à chaque message visiteur | → `wait_human` (bouton « Parler à un humain » ou intention détectée) |
+| `wait_human` | Transfert demandé, notification Telegram envoyée à l'admin | → `human` (dès qu'une réponse admin est postée) |
+| `human` | Conversation entièrement gérée par l'admin, le bot n'intervient plus | → `closed` (bouton Fermer) |
+| `closed` | Archivée | → `bot` sur un nouveau message si "Parler à un humain" est cliqué |
+
+Un badge de couleur (`Bot` gris, `Attente humain` orange, `Humain` vert, `Fermée` neutre) est visible dans la liste des conversations `/admin/chat`.
+
+### Entrées FAQ
+
+Chaque entrée contient :
+
+| Champ | Notes |
+|---|---|
+| Question (FR / EN / IT) | Formulation type que le visiteur pourrait poser. Utilisée par l'algo de similarité. |
+| Réponse (FR / EN / IT) | Texte envoyé automatiquement par le bot. |
+| Mots-clés | Liste séparée par virgule. Si tous les tokens d'un mot-clé apparaissent dans le message du visiteur, la similarité est boostée de +0.25. Idéal pour capter des variantes ("tarif, prix, coût"). |
+| Ordre | Tri d'affichage dans l'admin (pas dans le matching). |
+| Publié | Toggle. Entrée non publiée = ignorée par le bot. |
+
+### Algorithme de matching
+
+Aucune dépendance externe, tout en local (`src/lib/chatbot/matcher.ts`) :
+
+1. Normalisation (minuscule, sans accents, sans ponctuation).
+2. Similarité de Dice sur les bigrammes de caractères entre le message visiteur et les 3 versions de la question.
+3. Boost `+0.25` par mot-clé matché (tous les tokens du mot-clé doivent être présents).
+4. Meilleur score `≥ 0.3` → réponse envoyée. Sinon → fallback "je n'ai pas de réponse, cliquez sur Parler à un humain".
+
+Détection d'intention d'escalade : mots-clés "humain", "human", "personne", "parler à…" déclenchent automatiquement le transfert.
+
+### Bonnes pratiques
+
+- Prévoyez 5-10 entrées couvrant les FAQs concrètes (tarifs, dispo, technos, contact direct).
+- Utilisez des questions courtes et univoques — l'algo compare les bigrammes, plus la formulation est proche, plus le score monte.
+- Mettez les mots-clés au singulier et au pluriel : "projet, projets".
+- Testez en direct dans le widget de chat après chaque ajout.
+- Un message vide ou trop court (< 3 caractères) ne matche jamais.
 
 ## Messages
 

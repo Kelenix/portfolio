@@ -47,6 +47,7 @@ export async function GET(
       visitorName: conversation.visitorName,
       visitorEmail: conversation.visitorEmail,
       status: conversation.status,
+      mode: conversation.mode,
       createdAt: conversation.createdAt,
       lastMessageAt: conversation.lastMessageAt,
     },
@@ -89,7 +90,11 @@ export async function POST(
     }),
     prisma.chatConversation.update({
       where: { id },
-      data: { lastMessageAt: new Date(), status: "open" },
+      data: {
+        lastMessageAt: new Date(),
+        status: "open",
+        mode: "human",
+      },
     }),
   ]);
 

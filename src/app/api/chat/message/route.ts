@@ -6,6 +6,10 @@ import { notifyNewMessage } from "@/lib/notifications";
 import { getSiteUrl } from "@/lib/seo";
 import { checkAndConsume } from "@/lib/rate-limit";
 import { extractClientIp } from "@/lib/audit";
+import {
+  botLocaleFromAcceptLanguage,
+  decideBotReply,
+} from "@/lib/chatbot";
 
 const schema = z.object({
   body: z.string().min(1).max(4000),
@@ -54,6 +58,7 @@ export async function POST(req: NextRequest) {
       visitorId,
       visitorName: parsed.data.visitorName ?? null,
       visitorEmail: parsed.data.visitorEmail ?? null,
+      mode: "bot",
     },
   });
 
@@ -66,22 +71,90 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  const adminUrl = `${getSiteUrl()}/admin/chat/${conversation.id}`;
-  notifyNewMessage({
-    conversationId: conversation.id,
-    visitorName: conversation.visitorName,
-    visitorEmail: conversation.visitorEmail,
-    body: message.body,
-    adminUrl,
-  }).catch((e) => console.error("[chat] notify failed", e));
+  const locale = botLocaleFromAcceptLanguage(req.headers.get("accept-language"));
+  let botReply: {
+    id: string;
+    sender: string;
+    body: string;
+    createdAt: Date;
+  } | null = null;
+  let nextMode = conversation.mode;
+  let notifyHuman = false;
+
+  if (conversation.mode === "bot") {
+    const decision = await decideBotReply(message.body, locale);
+
+    if (decision.kind === "match") {
+      const reply = await prisma.chatMessage.create({
+        data: {
+          conversationId: conversation.id,
+          sender: "bot",
+          body: decision.reply,
+          readByAdmin: true,
+        },
+      });
+      botReply = reply;
+    } else if (decision.kind === "escalate") {
+      const reply = await prisma.chatMessage.create({
+        data: {
+          conversationId: conversation.id,
+          sender: "bot",
+          body: decision.reply,
+          readByAdmin: true,
+        },
+      });
+      botReply = reply;
+      nextMode = "wait_human";
+      notifyHuman = true;
+    } else {
+      const reply = await prisma.chatMessage.create({
+        data: {
+          conversationId: conversation.id,
+          sender: "bot",
+          body: decision.reply,
+          readByAdmin: true,
+        },
+      });
+      botReply = reply;
+    }
+  } else if (conversation.mode === "human" || conversation.mode === "wait_human") {
+    notifyHuman = true;
+  }
+
+  if (nextMode !== conversation.mode) {
+    await prisma.chatConversation.update({
+      where: { id: conversation.id },
+      data: { mode: nextMode },
+    });
+  }
+
+  if (notifyHuman) {
+    const adminUrl = `${getSiteUrl()}/admin/chat/${conversation.id}`;
+    notifyNewMessage({
+      conversationId: conversation.id,
+      visitorName: conversation.visitorName,
+      visitorEmail: conversation.visitorEmail,
+      body: message.body,
+      adminUrl,
+    }).catch((e) => console.error("[chat] notify failed", e));
+  }
 
   return NextResponse.json({
     conversationId: conversation.id,
+    mode: nextMode,
     message: {
       id: message.id,
       sender: message.sender,
       body: message.body,
       createdAt: message.createdAt,
     },
+    botReply: botReply
+      ? {
+          id: botReply.id,
+          sender: botReply.sender,
+          body: botReply.body,
+          createdAt: botReply.createdAt,
+        }
+      : null,
   });
 }

@@ -25,6 +25,7 @@ export default async function ChatListPage() {
     visitorName: c.visitorName,
     visitorEmail: c.visitorEmail,
     status: c.status,
+    mode: c.mode,
     lastMessageAt: c.lastMessageAt.toISOString(),
     lastMessage: c.messages[0]
       ? {

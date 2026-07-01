@@ -28,6 +28,7 @@ export async function GET() {
       visitorName: c.visitorName,
       visitorEmail: c.visitorEmail,
       status: c.status,
+      mode: c.mode,
       lastMessageAt: c.lastMessageAt,
       lastMessage: c.messages[0]
         ? {
