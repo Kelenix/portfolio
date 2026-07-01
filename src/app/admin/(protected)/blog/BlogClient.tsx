@@ -257,14 +257,38 @@ export function BlogClient({ initialPosts }: { initialPosts: BlogPost[] }) {
                     </label>
                     <textarea
                       {...register(fieldName("content", tab))}
-                      rows={8}
+                      rows={12}
                       className="w-full px-3 py-2 text-sm rounded-lg border outline-none resize-y font-mono"
                       style={{ background: "var(--muted)", borderColor: "var(--border)", color: "var(--foreground)" }}
-                      placeholder="Contenu de l'article en Markdown..."
+                      placeholder={"# Titre\n## Sous-titre\n\nParagraphe avec **gras**, *italique* et `code`.\n\n> Citation\n\n- item de liste\n- autre item\n\n```js\nconst x = 42;\n```"}
                     />
                   </div>
                 </div>
               ))}
+
+              <details
+                className="rounded-lg border text-xs"
+                style={{ borderColor: "var(--border)" }}
+              >
+                <summary
+                  className="cursor-pointer px-3 py-2 font-mono select-none"
+                  style={{ color: "var(--muted-foreground)" }}
+                >
+                  Syntaxe Markdown supportée
+                </summary>
+                <div
+                  className="px-3 pb-3 pt-1 space-y-1 font-mono"
+                  style={{ color: "var(--muted-foreground)" }}
+                >
+                  <div><code># Titre H1</code> · <code>## H2</code> · <code>### H3</code></div>
+                  <div><code>**gras**</code> · <code>*italique*</code> · <code>`code inline`</code></div>
+                  <div><code>[texte](https://…)</code></div>
+                  <div><code>&gt; citation</code> (une ou plusieurs lignes)</div>
+                  <div><code>- item</code> ou <code>1. item</code></div>
+                  <div><code>```lang</code> … <code>```</code> pour un bloc de code</div>
+                  <div>Ligne vide = nouveau paragraphe</div>
+                </div>
+              </details>
 
               <div>
                 <label className="block text-xs font-mono mb-1" style={{ color: "var(--muted-foreground)" }}>

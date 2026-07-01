@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 import { getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
-import { boldMarkdown } from "@/lib/utils";
+import { Markdown, stripMarkdown } from "@/lib/markdown";
 import {
   type AppLocale,
   buildLanguageAlternates,
@@ -15,7 +15,7 @@ import type { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 function excerpt(content: string, max = 160): string {
-  const plain = content.replace(/\*\*/g, "").replace(/\s+/g, " ").trim();
+  const plain = stripMarkdown(content);
   if (plain.length <= max) return plain;
   return plain.slice(0, max - 1).trimEnd() + "…";
 }
@@ -150,18 +150,8 @@ export default async function BlogPostPage({
           )}
         </header>
 
-        <div
-          className="prose prose-sm max-w-none"
-          style={{ color: "var(--foreground)" }}
-        >
-          {content.split("\n\n").map((paragraph, i) => (
-            <p
-              key={i}
-              className="mb-4 leading-relaxed text-sm"
-              style={{ color: "var(--foreground)" }}
-              dangerouslySetInnerHTML={{ __html: boldMarkdown(paragraph) }}
-            />
-          ))}
+        <div className="max-w-none">
+          <Markdown source={content} />
         </div>
       </article>
     </div>

@@ -155,12 +155,34 @@ Liste des articles avec édition complète.
 | Champ | Notes |
 |---|---|
 | Titre (FR · EN · IT) | Requis |
-| Contenu (FR · EN · IT) | Markdown léger — `**gras**` supporté, paragraphes séparés par double saut de ligne |
+| Contenu (FR · EN · IT) | Markdown — voir syntaxe supportée ci-dessous |
 | Slug | Auto-généré depuis le titre FR, modifiable |
 | Date de publication | Manuelle |
 | Publié | Toggle (articles non publiés invisibles côté public) |
 
 > Les articles non publiés sont indexés mais retournent 404 sur la page publique. Les articles publiés alimentent automatiquement le sitemap et le flux JSON-LD.
+
+### Syntaxe Markdown des articles
+
+Le rendu est fait par un parseur maison (aucune dépendance externe, aucun `dangerouslySetInnerHTML`). La syntaxe supportée :
+
+| Bloc | Notation |
+|---|---|
+| Titre H1 / H2 / H3 | `# Titre`, `## Titre`, `### Titre` |
+| Paragraphe | Une ou plusieurs lignes ; une ligne vide sépare deux paragraphes |
+| Citation | `> texte` (peut couvrir plusieurs lignes contiguës préfixées) |
+| Liste à puces | `- item` ou `* item` |
+| Liste ordonnée | `1. item` |
+| Bloc de code | Trois backticks ` ``` ` (optionnellement suivis d'un nom de langage) puis fermé par ` ``` ` |
+
+| Inline | Notation |
+|---|---|
+| Gras | `**texte**` |
+| Italique | `*texte*` ou `_texte_` |
+| Code inline | `` `code` `` |
+| Lien | `[libellé](https://…)` — les URLs externes s'ouvrent dans un nouvel onglet automatiquement |
+
+Le rendu respecte le thème clair / sombre via les variables CSS (`var(--foreground)`, `var(--muted)`, `var(--accent)`, `var(--border)`). Un pense-bête est disponible dans le formulaire admin (bloc "Syntaxe Markdown supportée").
 
 ## Réseaux sociaux
 
