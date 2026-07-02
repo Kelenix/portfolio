@@ -90,6 +90,7 @@ export default async function HomePage() {
     desc: isEn ? p.descEn : isIt ? p.descIt : p.descFr,
     url: p.url,
     github: p.github,
+    imageUrl: p.imageUrl,
     tags: p.tags,
   }));
 

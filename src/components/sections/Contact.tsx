@@ -9,10 +9,10 @@ export function Contact({ email }: { email: string }) {
 
   return (
     <section
-      className="py-16"
+      className="py-12"
       style={{ background: "var(--muted)" }}
     >
-      <div className="mx-auto max-w-4xl px-6">
+      <div className="mx-auto max-w-5xl px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -27,7 +27,7 @@ export function Contact({ email }: { email: string }) {
             {t("title")}
           </h2>
           <p
-            className="text-sm mb-8 max-w-md mx-auto"
+            className="text-sm mb-6 max-w-md mx-auto"
             style={{ color: "var(--muted-foreground)" }}
           >
             {t("subtitle")}

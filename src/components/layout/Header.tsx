@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
-import { Menu, MessageCircle, X } from "lucide-react";
+import { GraduationCap, Menu, MessageCircle, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { OPEN_CHAT_EVENT, UNREAD_CHAT_EVENT } from "@/components/chat/ChatWidget";
 
@@ -52,7 +52,7 @@ export function Header({ locale }: HeaderProps) {
         backdropFilter: scrolled ? "blur(12px)" : "none",
       }}
     >
-      <div className="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between">
+      <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
         <Link
           href="/"
           className="font-mono text-sm font-semibold tracking-wider hover:opacity-70 transition-opacity"
@@ -71,6 +71,16 @@ export function Header({ locale }: HeaderProps) {
             }}
           >
             {t("blog")}
+          </Link>
+          <Link
+            href="/courses"
+            className="flex items-center gap-1.5 text-sm transition-opacity hover:opacity-70"
+            style={{
+              color: isActive("/courses") ? "var(--foreground)" : "var(--muted-foreground)",
+            }}
+          >
+            <GraduationCap size={14} strokeWidth={1.5} />
+            {t("courses")}
           </Link>
           <button
             type="button"
@@ -117,6 +127,15 @@ export function Header({ locale }: HeaderProps) {
             onClick={() => setMenuOpen(false)}
           >
             {t("blog")}
+          </Link>
+          <Link
+            href="/courses"
+            className="flex items-center gap-2 text-sm py-2"
+            style={{ color: "var(--muted-foreground)" }}
+            onClick={() => setMenuOpen(false)}
+          >
+            <GraduationCap size={14} strokeWidth={1.5} />
+            {t("courses")}
           </Link>
           <button
             type="button"

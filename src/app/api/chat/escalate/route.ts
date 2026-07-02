@@ -6,6 +6,7 @@ import { getSiteUrl } from "@/lib/seo";
 import {
   ESCALATION_MESSAGES,
   botLocaleFromAcceptLanguage,
+  detectMessageLocale,
   type BotLocale,
 } from "@/lib/chatbot";
 
@@ -31,8 +32,18 @@ export async function POST(req: NextRequest) {
   } catch {
     /* no body */
   }
-  const locale =
+  const widgetLocale =
     bodyLocale ?? botLocaleFromAcceptLanguage(req.headers.get("accept-language"));
+
+  const lastVisitorMessage = await prisma.chatMessage.findFirst({
+    where: { conversationId: conversation.id, sender: "visitor" },
+    orderBy: { createdAt: "desc" },
+    select: { body: true },
+  });
+
+  const locale = lastVisitorMessage
+    ? detectMessageLocale(lastVisitorMessage.body, widgetLocale)
+    : widgetLocale;
 
   if (conversation.mode === "bot" || conversation.mode === "closed") {
     await prisma.chatConversation.update({

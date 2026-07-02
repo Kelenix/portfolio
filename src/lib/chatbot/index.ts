@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import type { AppLocale } from "@/lib/seo";
 import {
+  detectMessageLocale,
   findBestMatch,
   looksLikeEscalationIntent,
   parseKeywords,
@@ -9,6 +10,8 @@ import {
 } from "./matcher";
 
 export type BotLocale = AppLocale;
+
+export { detectMessageLocale };
 
 const FALLBACK: Record<BotLocale, string> = {
   fr: "Je n'ai pas de réponse toute prête. Cliquez sur « Parler à un humain » pour joindre Lionel directement.",
@@ -56,13 +59,15 @@ export type BotDecision =
 
 export async function decideBotReply(
   visitorMessage: string,
-  locale: BotLocale
-): Promise<BotDecision> {
+  widgetLocale: BotLocale
+): Promise<BotDecision & { replyLocale: BotLocale }> {
+  const replyLocale = detectMessageLocale(visitorMessage, widgetLocale);
+
   if (looksLikeEscalationIntent(visitorMessage)) {
-    return { kind: "escalate", reply: ESCALATION_ACK[locale] };
+    return { kind: "escalate", reply: ESCALATION_ACK[replyLocale], replyLocale };
   }
 
-  const candidates = await loadFaqCandidates(locale);
+  const candidates = await loadFaqCandidates(replyLocale);
   const match: MatchResult | null = findBestMatch(visitorMessage, candidates);
 
   if (match) {
@@ -71,10 +76,11 @@ export async function decideBotReply(
       reply: match.entry.answer,
       entryId: match.entry.id,
       score: match.score,
+      replyLocale,
     };
   }
 
-  return { kind: "fallback", reply: FALLBACK[locale] };
+  return { kind: "fallback", reply: FALLBACK[replyLocale], replyLocale };
 }
 
 export const ESCALATION_MESSAGES = ESCALATION_ACK;

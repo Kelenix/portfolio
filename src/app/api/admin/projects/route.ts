@@ -12,6 +12,7 @@ const schema = z.object({
   descIt: z.string().min(1),
   url: z.string().nullable().optional(),
   github: z.string().nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
   tags: z.string().optional(),
   order: z.number().int().min(0).optional(),
   published: z.boolean().optional(),

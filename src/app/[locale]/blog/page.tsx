@@ -55,7 +55,7 @@ export default async function BlogPage() {
     isEn ? post.titleEn : isIt ? post.titleIt : post.titleFr;
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-16">
+    <div className="mx-auto max-w-5xl px-6 py-16">
       <h1
         className="text-2xl font-mono font-bold mb-3"
         style={{ color: "var(--foreground)" }}

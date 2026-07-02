@@ -109,3 +109,30 @@ export function looksLikeEscalationIntent(text: string): boolean {
   const n = normalize(text);
   return ESCALATION_PATTERNS.some((r) => r.test(n));
 }
+
+const LANG_MARKERS: Record<"fr" | "en" | "it", RegExp> = {
+  fr: /\b(quels?|quelles?|est-ce|c'est|voila|voilà|francais|français|bonjour|salut|merci|combien|comment|ou|où|pourquoi|avec|pour|dans|sur|vous|tu|es|je|tes|mes|ses|les|des|au|aux|une|un|le|la|il|elle|nous|ils|elles|tarifs?|prix|contact|projets?|questions?|besoin|voudrais|aimerais|voulez|pouvez|savoir)\b/g,
+  en: /\b(what|how|why|where|when|which|thanks|hello|hi|do|does|did|please|okay|good|the|you|your|are|is|am|i|we|they|he|she|it|would|could|should|would|price|rates?|pricing|help|need|want|about|for)\b/g,
+  it: /\b(quali|quale|come|dove|perche|perché|quando|ciao|grazie|prego|italiano|italiana|buongiorno|buonasera|per\s+favore|sono|sei|è|siamo|siete|sono|il|la|lo|gli|le|un|una|uno|del|della|dello|degli|delle|con|per|di|in|su|tariffe|prezzo|prezzi|costo|costi|aiuto|posso|puoi|vorrei|voglio|informazioni)\b/g,
+};
+
+export function detectMessageLocale(
+  text: string,
+  fallback: "fr" | "en" | "it"
+): "fr" | "en" | "it" {
+  const lower = normalize(text);
+  const scores: Record<"fr" | "en" | "it", number> = { fr: 0, en: 0, it: 0 };
+  for (const lang of ["fr", "en", "it"] as const) {
+    const matches = lower.match(LANG_MARKERS[lang]);
+    if (matches) scores[lang] = matches.length;
+  }
+  let best: "fr" | "en" | "it" = fallback;
+  let bestScore = 0;
+  for (const lang of ["fr", "en", "it"] as const) {
+    if (scores[lang] > bestScore) {
+      best = lang;
+      bestScore = scores[lang];
+    }
+  }
+  return bestScore > 0 ? best : fallback;
+}

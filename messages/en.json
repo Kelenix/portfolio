@@ -2,7 +2,12 @@
   "nav": {
     "blog": "Blog",
     "admin": "Admin",
-    "chat": "Chat"
+    "chat": "Chat",
+    "courses": "Courses"
+  },
+  "courses": {
+    "catalogTitle": "Courses",
+    "catalogSubtitle": "My training platforms. Each link opens a dedicated platform."
   },
   "chat": {
     "openLabel": "Open chat",

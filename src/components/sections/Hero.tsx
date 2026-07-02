@@ -43,7 +43,7 @@ export function Hero({ profile }: { profile: ProfileData }) {
   const t = useTranslations("hero");
 
   return (
-    <section className="mx-auto max-w-4xl px-6 pt-16 pb-20">
+    <section className="mx-auto max-w-5xl px-6 pt-12 pb-8">
       <motion.div variants={container} initial="hidden" animate="show" className="flex flex-col gap-6">
 
         {/* Photo + Name */}

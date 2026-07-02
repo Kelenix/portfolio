@@ -52,7 +52,7 @@ export function TechStack({ skills }: { skills: SkillItem[] }) {
   if (visibleGroups.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-4xl px-6 py-16">
+    <section className="mx-auto max-w-5xl px-6 py-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -60,7 +60,7 @@ export function TechStack({ skills }: { skills: SkillItem[] }) {
         transition={{ duration: 0.5 }}
       >
         <h2
-          className="text-xs font-mono font-semibold tracking-widest uppercase mb-8 pb-2 border-b"
+          className="text-xs font-mono font-semibold tracking-widest uppercase mb-6 pb-2 border-b"
           style={{ color: "var(--muted-foreground)", borderColor: "var(--border)" }}
         >
           {t("title")}

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, Edit2, Trash2, Eye, EyeOff, Loader2, X } from "lucide-react";
+import { Plus, Edit2, Trash2, Eye, EyeOff, Loader2, X, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/components/admin/Toast";
 import type { Project } from "@prisma/client";
 
@@ -29,6 +29,9 @@ export function ProjectsClient({ initialProjects }: { initialProjects: Project[]
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("fr");
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
   const { toast } = useToast();
 
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<FormData>({
@@ -38,6 +41,7 @@ export function ProjectsClient({ initialProjects }: { initialProjects: Project[]
   const openCreate = () => {
     setEditId(null);
     reset({ titleFr: "", titleEn: "", titleIt: "", descFr: "", descEn: "", descIt: "", url: "", github: "", tags: "[]", published: true });
+    setImageUrl(null);
     setShowForm(true);
   };
 
@@ -55,7 +59,34 @@ export function ProjectsClient({ initialProjects }: { initialProjects: Project[]
       tags: p.tags,
       published: p.published,
     });
+    setImageUrl(p.imageUrl ?? null);
     setShowForm(true);
+  };
+
+  const uploadImage = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast("error", "Format non supporté");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast("error", "Image trop lourde (max 5 Mo)");
+      return;
+    }
+    setUploadingImage(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", "projects");
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error();
+      const { url } = (await res.json()) as { url: string };
+      setImageUrl(url);
+      toast("success", "Image téléversée");
+    } catch {
+      toast("error", "Upload échoué");
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const onSubmit = async (data: FormData) => {
@@ -66,6 +97,7 @@ export function ProjectsClient({ initialProjects }: { initialProjects: Project[]
         published: data.published ?? true,
         url: data.url || null,
         github: data.github || null,
+        imageUrl,
         order: editId ? undefined : projects.length,
       };
 
@@ -269,6 +301,58 @@ export function ProjectsClient({ initialProjects }: { initialProjects: Project[]
                   style={{ background: "var(--muted)", borderColor: "var(--border)", color: "var(--foreground)" }}
                   placeholder='["Next.js","TypeScript"]'
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono mb-2" style={{ color: "var(--muted-foreground)" }}>
+                  Image (thumbnail carré, 56×56 utilisé sur la home)
+                </label>
+                <div className="flex items-start gap-3">
+                  <div
+                    className="w-16 h-16 rounded-2xl overflow-hidden border flex items-center justify-center shrink-0"
+                    style={{ background: "var(--muted)", borderColor: "var(--border)" }}
+                  >
+                    {imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={imageUrl} alt="thumbnail" className="w-full h-full object-cover" />
+                    ) : (
+                      <ImageIcon size={16} style={{ color: "var(--muted-foreground)" }} />
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <input
+                      ref={imageInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) uploadImage(f);
+                        if (imageInputRef.current) imageInputRef.current.value = "";
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => imageInputRef.current?.click()}
+                      disabled={uploadingImage}
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono rounded border disabled:opacity-50"
+                      style={{ borderColor: "var(--border)", color: "var(--foreground)" }}
+                    >
+                      {uploadingImage ? <Loader2 size={11} className="animate-spin" /> : <ImageIcon size={11} />}
+                      {uploadingImage ? "Upload…" : imageUrl ? "Remplacer" : "Uploader"}
+                    </button>
+                    {imageUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setImageUrl(null)}
+                        className="text-[11px] font-mono hover:opacity-70 text-left"
+                        style={{ color: "#ef4444" }}
+                      >
+                        Retirer
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-between pt-2">

@@ -73,10 +73,10 @@ export async function Footer() {
 
   return (
     <footer
-      className="border-t mt-24"
+      className="border-t mt-16"
       style={{ borderColor: "var(--border)", background: "var(--muted)" }}
     >
-      <div className="mx-auto max-w-4xl px-6 py-12">
+      <div className="mx-auto max-w-5xl px-6 py-10">
         {hasAnyColumn && (
           <div className="grid grid-cols-2 gap-8 mb-8">
             {formations.length > 0 && (
