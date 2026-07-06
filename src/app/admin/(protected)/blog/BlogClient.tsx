@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/components/admin/Toast";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
 import type { BlogPost } from "@prisma/client";
 
 const schema = z.object({
@@ -45,6 +46,7 @@ export function BlogClient({ initialPosts }: { initialPosts: BlogPost[] }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const pendingTabRef = useRef<Tab | null>(null);
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   const {
     register,
@@ -124,7 +126,7 @@ export function BlogClient({ initialPosts }: { initialPosts: BlogPost[] }) {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer cet article ?")) return;
+    if (!(await confirm({ message: "Supprimer cet article ?" }))) return;
     try {
       const res = await fetch(`/api/admin/blog/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();

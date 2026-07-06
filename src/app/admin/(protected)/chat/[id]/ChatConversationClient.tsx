@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Send, Loader2, Trash2, Archive, RefreshCw, Bot } from "lucide-react";
 import { useToast } from "@/components/admin/Toast";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
 
 type Message = {
   id: string;
@@ -48,6 +49,7 @@ export function ChatConversationClient({
       : 0
   );
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   useEffect(() => {
     let cancelled = false;
@@ -149,7 +151,7 @@ export function ChatConversationClient({
   };
 
   const remove = async () => {
-    if (!confirm("Supprimer définitivement cette conversation ?")) return;
+    if (!(await confirm({ message: "Supprimer définitivement cette conversation ?" }))) return;
     try {
       const res = await fetch(`/api/admin/chat/${conversation.id}`, {
         method: "DELETE",

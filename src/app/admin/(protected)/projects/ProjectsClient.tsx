@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Plus, Edit2, Trash2, Eye, EyeOff, Loader2, X, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/components/admin/Toast";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
 import type { Project } from "@prisma/client";
 
 const schema = z.object({
@@ -33,6 +34,7 @@ export function ProjectsClient({ initialProjects }: { initialProjects: Project[]
   const [uploadingImage, setUploadingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -143,7 +145,7 @@ export function ProjectsClient({ initialProjects }: { initialProjects: Project[]
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer ce projet ?")) return;
+    if (!(await confirm({ message: "Supprimer ce projet ?" }))) return;
     try {
       const res = await fetch(`/api/admin/projects/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();

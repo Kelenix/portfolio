@@ -5,6 +5,7 @@ import { Plus, Trash2, Edit2, Loader2, X, Check } from "lucide-react";
 import { FaGithub, FaLinkedinIn, FaYoutube } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { useToast } from "@/components/admin/Toast";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
 import type { SocialLink } from "@prisma/client";
 
 const PLATFORMS = ["GitHub", "LinkedIn", "Twitter", "YouTube", "Instagram", "TikTok", "Discord", "Twitch"] as const;
@@ -30,6 +31,7 @@ export function SocialClient({ initialSocials }: { initialSocials: SocialLink[] 
   const [editState, setEditState] = useState<EditState | null>(null);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   const handleAdd = async () => {
     if (!newUrl.trim()) return;
@@ -74,7 +76,7 @@ export function SocialClient({ initialSocials }: { initialSocials: SocialLink[] 
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer ce réseau ?")) return;
+    if (!(await confirm({ message: "Supprimer ce réseau ?" }))) return;
     try {
       const res = await fetch(`/api/admin/social/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();

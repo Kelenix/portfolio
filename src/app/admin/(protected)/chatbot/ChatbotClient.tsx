@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/components/admin/Toast";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
 
 const schema = z.object({
   questionFr: z.string().min(1, "Requis"),
@@ -45,6 +46,7 @@ export function ChatbotClient({ initialEntries }: { initialEntries: FaqEntry[] }
   const [editId, setEditId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("fr");
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   const {
     register,
@@ -130,7 +132,7 @@ export function ChatbotClient({ initialEntries }: { initialEntries: FaqEntry[] }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer cette entrée FAQ ?")) return;
+    if (!(await confirm({ message: "Supprimer cette entrée FAQ ?" }))) return;
     try {
       const res = await fetch(`/api/admin/chatbot/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();

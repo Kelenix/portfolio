@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus, Trash2, Edit2, Loader2, X, Check, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/components/admin/Toast";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
 import type { FooterLink } from "@prisma/client";
 
 const COLUMNS = [
@@ -44,6 +45,7 @@ export function FooterClient({ initialLinks }: { initialLinks: FooterLink[] }) {
   const [editState, setEditState] = useState<EditState | null>(null);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   const linksByColumn = (col: ColumnValue) =>
     links.filter((l) => l.column === col).sort((a, b) => a.order - b.order);
@@ -108,7 +110,7 @@ export function FooterClient({ initialLinks }: { initialLinks: FooterLink[] }) {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer ce lien ?")) return;
+    if (!(await confirm({ message: "Supprimer ce lien ?" }))) return;
     try {
       const res = await fetch(`/api/admin/footer-links/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();

@@ -14,16 +14,18 @@ Google traite ces trois identités comme **séparées** tant qu'elles ne sont pa
 
 ## 2. Corrections techniques à faire sur lionel-dev.site
 
-- [ ] Remplacer les liens `yourhandle` (GitHub, Twitter) par les vrais liens, ou les supprimer.
-- [ ] Corriger le lien "Play Store" de SkillMock (il pointe actuellement vers une recherche Brave).
-- [ ] Ajouter un lien direct vers la page développeur Google Play : `https://play.google.com/store/apps/developer?id=Kelenixdev`
-- [ ] Ajouter "Djouaka Kelefack Lionel" dans le H1/sous-titre, le `<title>`, la meta-description et les mots-clés.
-- [ ] Ajouter le bloc JSON-LD ci-dessous dans le `<head>` de la page d'accueil.
-- [ ] Vérifier le sitemap.xml et le soumettre dans Google Search Console.
+- [ ] Remplacer les liens `yourhandle` (GitHub, Twitter) par les vrais liens, ou les supprimer. → **À faire dans l'admin** (liens sociaux stockés en base).
+- [ ] Corriger le lien "Play Store" de SkillMock (il pointe actuellement vers une recherche Brave). → **À faire dans l'admin** (donnée en base).
+- [x] Ajouter un lien direct vers la page développeur Google Play : `https://play.google.com/store/apps/developer?id=Kelenixdev`. → Ajouté dans le `sameAs` du JSON-LD (`src/lib/seo.ts` → `CANONICAL_SAME_AS`).
+- [~] Ajouter "Djouaka Kelefack Lionel" dans le H1/sous-titre, le `<title>`, la meta-description et les mots-clés. → **Mots-clés + JSON-LD faits** (variantes de nom injectées via `NAME_KEYWORDS`). **Reste : le H1 et le `<title>`** dépendent du nom stocké en base → mettre à jour le profil (FR/EN/IT) dans l'admin en "Djouaka Kelefack Lionel".
+- [x] Ajouter le bloc JSON-LD dans le `<head>` de la page d'accueil. → Déjà présent et **enrichi** (`src/app/[locale]/page.tsx`) : `name` canonique, `alternateName`, `givenName`/`familyName`, `nationality`, `address`, `alumniOf`, `sameAs`.
+- [x] Vérifier le sitemap.xml. → OK, déjà généré (`src/app/sitemap.ts`, multilingue + hreflang). **Reste : le soumettre dans Google Search Console** (voir étape 6).
 
 ---
 
-## 3. Bloc JSON-LD "Person" à coller dans le `<head>`
+## 3. Bloc JSON-LD "Person" (implémenté ✅ — référence)
+
+> ✅ **Déjà en place dans le code** : ce bloc est généré dynamiquement dans `src/app/[locale]/page.tsx` à partir du profil + des constantes de `src/lib/seo.ts`. Le JSON ci-dessous reste à titre de référence.
 
 ```html
 <script type="application/ld+json">
@@ -77,7 +79,9 @@ Google traite ces trois identités comme **séparées** tant qu'elles ne sont pa
 
 ---
 
-## 4. Métadonnées corrigées (balises `<head>`)
+## 4. Métadonnées corrigées (balises `<head>`) — implémenté ✅
+
+> ✅ **Déjà en place** : `title`, `description`, `keywords` (avec les variantes de nom), Open Graph et Twitter sont générés dans `src/app/[locale]/layout.tsx`. Le `title` et la `description` restent basés sur le **nom stocké en base** → à mettre à jour dans l'admin pour qu'ils contiennent "Djouaka Kelefack Lionel". Le bloc ci-dessous reste à titre de référence.
 
 ```html
 <title>Lionel Djouaka Kelefack — Développeur Logiciel & Créateur d'Applications (Kelenixdev)</title>
@@ -99,7 +103,7 @@ Google traite ces trois identités comme **séparées** tant qu'elles ne sont pa
 
 | Plateforme | Contient le nom complet ? | Lien vers le site ? |
 |---|---|---|
-| lionel-dev.site | À corriger (étape 2) | — |
+| lionel-dev.site | ⏳ Partiel : JSON-LD + mots-clés OK ; H1/`<title>` = nom en base à mettre à jour dans l'admin | — |
 | LinkedIn | ✅ Oui | À ajouter dans "Informations de contact" |
 | Google Play (Kelenixdev) | ❌ Non | À ajouter dans la description du profil développeur |
 | GitHub | À vérifier | À ajouter dans la bio |

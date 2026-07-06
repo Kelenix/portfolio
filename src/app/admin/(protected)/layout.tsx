@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { ToastContainer } from "@/components/admin/Toast";
+import { ConfirmContainer } from "@/components/admin/ConfirmDialog";
 import { AdminSessionGuard } from "@/components/admin/AdminSessionGuard";
 import { IdleTimeout } from "@/components/admin/IdleTimeout";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
@@ -41,6 +42,7 @@ export default async function ProtectedAdminLayout({
           <main className="flex-1 p-8">{children}</main>
         </div>
         <ToastContainer />
+        <ConfirmContainer />
         <AdminSessionGuard />
         <IdleTimeout />
       </div>
