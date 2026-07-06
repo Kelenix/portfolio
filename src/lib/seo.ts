@@ -42,3 +42,50 @@ export function pickLocaleField<T>(
 }
 
 export const SITE_NAME = "Portfolio";
+
+/**
+ * Identité canonique pour le référencement (SEO / Knowledge Graph Google).
+ *
+ * CANONICAL_NAME est le nom principal que l'on veut voir ressortir dans les
+ * recherches Google. NAME_ALTERNATES regroupe toutes les autres formes du nom
+ * et pseudonymes utilisés sur les différentes plateformes, afin que Google les
+ * relie à une seule et même personne (schema.org `alternateName`).
+ */
+export const CANONICAL_NAME = "Djouaka Kelefack Lionel";
+
+export const NAME_ALTERNATES = [
+  "Lionel Djouaka Kelefack",
+  "Lionel Djouaka",
+  "Djouaka Lionel",
+  "Kelenixdev",
+];
+
+/** Formes de nom à injecter dans les mots-clés / balises meta. */
+export const NAME_KEYWORDS = [CANONICAL_NAME, ...NAME_ALTERNATES];
+
+export const GIVEN_NAME = "Lionel";
+export const FAMILY_NAME = "Djouaka Kelefack";
+
+/** Page développeur Google Play (pseudonyme Kelenixdev). */
+export const PLAY_STORE_DEVELOPER_URL =
+  "https://play.google.com/store/apps/developer?id=Kelenixdev";
+
+/** Profils publics reliés à l'identité (schema.org `sameAs`). */
+export const CANONICAL_SAME_AS = [
+  "https://www.linkedin.com/in/lioneldjouaka/",
+  PLAY_STORE_DEVELOPER_URL,
+];
+
+export const PERSON_NATIONALITY = "Cameroonian";
+
+export const PERSON_ADDRESS = {
+  "@type": "PostalAddress",
+  addressLocality: "Ancona",
+  addressRegion: "Marche",
+  addressCountry: "IT",
+} as const;
+
+export const PERSON_ALUMNI_OF = {
+  "@type": "CollegeOrUniversity",
+  name: "Università Politecnica delle Marche",
+} as const;

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus, Trash2, Edit2, Eye, EyeOff, Loader2, X, Check } from "lucide-react";
 import { useToast } from "@/components/admin/Toast";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
 import type { Skill } from "@prisma/client";
 
 const CATEGORIES = ["frontend", "backend", "devops", "tools"] as const;
@@ -80,6 +81,7 @@ export function SkillsClient({ initialSkills }: { initialSkills: Skill[] }) {
   const [newCategory, setNewCategory] = useState<Category>("frontend");
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   const byCategory = CATEGORIES.reduce<Record<Category, Skill[]>>(
     (acc, cat) => {
@@ -159,7 +161,7 @@ export function SkillsClient({ initialSkills }: { initialSkills: Skill[] }) {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer cette technologie ?")) return;
+    if (!(await confirm({ message: "Supprimer cette technologie ?" }))) return;
     try {
       const res = await fetch(`/api/admin/skills/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();

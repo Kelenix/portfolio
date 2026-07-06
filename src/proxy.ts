@@ -51,6 +51,13 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Routes de métadonnées Next servies à la racine sans extension (favicon
+  // dynamique /icon, etc.). Sans ça, le middleware i18n les redirige vers
+  // /fr/icon et renvoie un 404.
+  if (pathname === "/icon" || pathname.startsWith("/icon/")) {
+    return NextResponse.next();
+  }
+
   return intlMiddleware(request);
 }
 

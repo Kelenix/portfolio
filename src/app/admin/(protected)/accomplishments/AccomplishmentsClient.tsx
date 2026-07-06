@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Plus, Edit2, Trash2, Eye, EyeOff, Loader2, X } from "lucide-react";
 import { useToast } from "@/components/admin/Toast";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
 import type { Accomplishment } from "@prisma/client";
 
 const schema = z.object({
@@ -28,6 +29,7 @@ export function AccomplishmentsClient({ initialItems }: { initialItems: Accompli
   const [editId, setEditId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("fr");
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -109,7 +111,7 @@ export function AccomplishmentsClient({ initialItems }: { initialItems: Accompli
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer ?")) return;
+    if (!(await confirm({ message: "Supprimer cet accomplissement ?" }))) return;
     try {
       await fetch(`/api/admin/accomplishments/${id}`, { method: "DELETE" });
       setItems((prev) => prev.filter((i) => i.id !== id));

@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { Plus, Trash2, Edit2, Loader2, X, Check, Eye, EyeOff, Upload } from "lucide-react";
 import { useToast } from "@/components/admin/Toast";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
 import type { MobileApp } from "@prisma/client";
 
 interface FormState {
@@ -34,6 +35,7 @@ export function MobileAppsClient({ initialApps }: { initialApps: MobileApp[] }) 
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   const resetForm = () => {
     setForm(emptyForm);
@@ -123,7 +125,7 @@ export function MobileAppsClient({ initialApps }: { initialApps: MobileApp[] }) 
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer cette application ?")) return;
+    if (!(await confirm({ message: "Supprimer cette application ?" }))) return;
     try {
       const res = await fetch(`/api/admin/mobile-apps/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();

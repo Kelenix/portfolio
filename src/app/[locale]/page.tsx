@@ -11,6 +11,14 @@ import {
   buildLanguageAlternates,
   getSiteUrl,
   localizedPath,
+  CANONICAL_NAME,
+  NAME_ALTERNATES,
+  GIVEN_NAME,
+  FAMILY_NAME,
+  CANONICAL_SAME_AS,
+  PERSON_NATIONALITY,
+  PERSON_ADDRESS,
+  PERSON_ALUMNI_OF,
 } from "@/lib/seo";
 import type { Metadata } from "next";
 
@@ -106,26 +114,44 @@ export default async function HomePage() {
   const siteUrl = getSiteUrl();
   const homeUrl = localizedPath(locale, "/");
 
+  // Toutes les formes du nom, sans doublon, pour relier les identités entre
+  // elles dans le Knowledge Graph de Google (alternateName).
+  const alternateNames = Array.from(
+    new Set([...NAME_ALTERNATES, profileData.name].filter(Boolean))
+  ).filter((n) => n !== CANONICAL_NAME);
+
+  // sameAs = liens vers les profils publics (réseaux du profil + liens
+  // canoniques comme LinkedIn / page développeur Google Play), sans doublon.
+  const sameAs = Array.from(
+    new Set([...profileData.socials.map((s) => s.url), ...CANONICAL_SAME_AS])
+  );
+
   const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
-    name: profileData.name,
+    name: CANONICAL_NAME,
+    alternateName: alternateNames,
+    givenName: GIVEN_NAME,
+    familyName: FAMILY_NAME,
     jobTitle: profileData.role,
     description: profileData.bio,
     email: profileData.email ? `mailto:${profileData.email}` : undefined,
     image: profileData.photoUrl || undefined,
     url: homeUrl,
-    sameAs: profileData.socials.map((s) => s.url),
+    nationality: PERSON_NATIONALITY,
+    address: PERSON_ADDRESS,
+    alumniOf: PERSON_ALUMNI_OF,
+    sameAs,
     knowsAbout: skills.map((s) => s.name),
   };
 
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: profileData.name,
+    name: CANONICAL_NAME,
     url: siteUrl,
     inLanguage: locale,
-    author: { "@type": "Person", name: profileData.name },
+    author: { "@type": "Person", name: CANONICAL_NAME },
   };
 
   return (

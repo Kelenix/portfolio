@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { Mail, MailOpen, Trash2 } from "lucide-react";
 import { useToast } from "@/components/admin/Toast";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
 import type { ContactMessage } from "@prisma/client";
 
 export function MessagesClient({ initialMessages }: { initialMessages: ContactMessage[] }) {
   const [messages, setMessages] = useState<ContactMessage[]>(initialMessages);
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   const markRead = async (id: string, read: boolean) => {
     try {
@@ -23,7 +25,7 @@ export function MessagesClient({ initialMessages }: { initialMessages: ContactMe
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer ce message ?")) return;
+    if (!(await confirm({ message: "Supprimer ce message ?" }))) return;
     try {
       await fetch(`/api/admin/messages/${id}`, { method: "DELETE" });
       setMessages((prev) => prev.filter((m) => m.id !== id));
