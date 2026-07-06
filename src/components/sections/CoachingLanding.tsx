@@ -144,13 +144,34 @@ export function CoachingLanding() {
                 tu débutes de zéro.
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center gap-4">
+              {/* Badge date bien voyant */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.25 }}
+                className="mt-7 inline-flex items-center gap-3 rounded-2xl px-5 py-3 shadow-lg"
+                style={{
+                  background: "linear-gradient(90deg,#3b82f6,#a855f7)",
+                }}
+              >
+                <Calendar size={22} className="shrink-0 text-white" />
+                <span className="text-left leading-tight text-white">
+                  <span className="block text-[11px] font-semibold uppercase tracking-widest opacity-90">
+                    Démarrage
+                  </span>
+                  <span className="block text-xl font-extrabold md:text-2xl">
+                    10 juillet 2026
+                  </span>
+                </span>
+              </motion.div>
+
+              <div className="mt-6 flex flex-wrap items-center gap-4">
                 <CTAButton large />
                 <span
-                  className="text-xs font-mono"
-                  style={{ color: "var(--muted-foreground)" }}
+                  className="text-sm font-semibold"
+                  style={{ color: "#a855f7" }}
                 >
-                  Places limitées · Groupe privé
+                  🔥 Places limitées
                 </span>
               </div>
 
@@ -432,13 +453,22 @@ export function CoachingLanding() {
             Rejoins le groupe WhatsApp privé du coaching. C'est là que tout se
             passe : accompagnement, ressources et lancement de ton projet.
           </p>
-          <div className="mt-8 flex flex-col items-center gap-3">
+          <div className="mt-8 flex flex-col items-center gap-4">
+            <div
+              className="inline-flex items-center gap-2.5 rounded-2xl px-5 py-2.5 shadow-lg"
+              style={{ background: "linear-gradient(90deg,#3b82f6,#a855f7)" }}
+            >
+              <Calendar size={18} className="shrink-0 text-white" />
+              <span className="text-base font-extrabold text-white md:text-lg">
+                Démarrage le 10 juillet 2026
+              </span>
+            </div>
             <CTAButton large />
             <span
-              className="inline-flex items-center gap-1.5 text-xs font-mono"
-              style={{ color: "var(--muted-foreground)" }}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold"
+              style={{ color: "#a855f7" }}
             >
-              <Clock size={12} /> Démarrage imminent · Places limitées
+              <Clock size={14} /> 🔥 Places limitées
             </span>
           </div>
         </motion.div>
