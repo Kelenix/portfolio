@@ -36,11 +36,8 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
-  },
+  // L'icône est générée dynamiquement depuis la photo de profil via
+  // src/app/icon.tsx (convention de fichier Next.js) — pas de favicon.ico statique.
   manifest: "/manifest.webmanifest",
 };
 
