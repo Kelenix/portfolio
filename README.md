@@ -2,6 +2,7 @@
 
 Portfolio personnel multilingue (FR · EN · IT) construit avec **Next.js 16**, **TypeScript**, **Prisma** et **Supabase**, avec un dashboard d'administration permettant d'éditer tout le contenu sans toucher au code.
 
+
 ![Next.js](https://img.shields.io/badge/Next.js-16-000?logo=nextdotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
