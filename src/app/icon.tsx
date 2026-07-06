@@ -1,9 +1,11 @@
 import { ImageResponse } from "next/og";
 import { prisma } from "@/lib/db";
+import sharp from "sharp";
 
 // Favicon généré dynamiquement à partir de la photo de profil (rond, comme
-// l'avatar du site). Repli sur l'initiale du nom si la photo est absente ou
-// impossible à charger.
+// l'avatar du site). La photo est d'abord redimensionnée en 64×64 avec sharp :
+// next/og ne sait pas décoder une image lourde (plusieurs Mo) dans une fonction
+// serverless, ce qui provoquait un repli silencieux sur l'initiale.
 export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
 export const dynamic = "force-dynamic";
@@ -47,34 +49,29 @@ export default async function Icon() {
 
   if (!photoUrl) return letterIcon(initial);
 
-  // On récupère nous-mêmes les octets de l'image et on les passe en data URL :
-  // c'est bien plus fiable que de laisser next/og aller chercher l'URL distante.
   try {
     const res = await fetch(photoUrl);
     if (!res.ok) return letterIcon(initial);
-    const buffer = await res.arrayBuffer();
-    const type = res.headers.get("content-type") || "image/jpeg";
-    const dataUrl = `data:${type};base64,${Buffer.from(buffer).toString("base64")}`;
+
+    const input = Buffer.from(await res.arrayBuffer());
+
+    // Redimensionnement 64×64 + masque circulaire (coins transparents).
+    const circle = Buffer.from(
+      '<svg width="64" height="64"><circle cx="32" cy="32" r="32" fill="#fff"/></svg>'
+    );
+    const png = await sharp(input)
+      .resize(64, 64, { fit: "cover" })
+      .composite([{ input: circle, blend: "dest-in" }])
+      .png()
+      .toBuffer();
+
+    const dataUrl = `data:image/png;base64,${png.toString("base64")}`;
 
     return new ImageResponse(
       (
-        <div
-          style={{
-            display: "flex",
-            width: "100%",
-            height: "100%",
-            overflow: "hidden",
-            borderRadius: "50%",
-          }}
-        >
+        <div style={{ display: "flex", width: "100%", height: "100%" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={dataUrl}
-            width={64}
-            height={64}
-            alt=""
-            style={{ width: "64px", height: "64px", objectFit: "cover" }}
-          />
+          <img src={dataUrl} width={64} height={64} alt="" />
         </div>
       ),
       { ...size }
