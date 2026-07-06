@@ -3,7 +3,8 @@
     "blog": "Blog",
     "admin": "Admin",
     "chat": "Chat",
-    "courses": "Cours"
+    "courses": "Cours",
+    "coaching": "Coaching"
   },
   "courses": {
     "catalogTitle": "Cours",

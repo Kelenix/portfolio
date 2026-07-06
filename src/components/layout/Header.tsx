@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
-import { GraduationCap, Menu, MessageCircle, X } from "lucide-react";
+import { GraduationCap, Menu, MessageCircle, Rocket, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { OPEN_CHAT_EVENT, UNREAD_CHAT_EVENT } from "@/components/chat/ChatWidget";
 
@@ -82,6 +82,16 @@ export function Header({ locale }: HeaderProps) {
             <GraduationCap size={14} strokeWidth={1.5} />
             {t("courses")}
           </Link>
+          <Link
+            href="/coaching"
+            className="flex items-center gap-1.5 text-sm transition-opacity hover:opacity-70"
+            style={{
+              color: isActive("/coaching") ? "var(--foreground)" : "var(--muted-foreground)",
+            }}
+          >
+            <Rocket size={14} strokeWidth={1.5} />
+            {t("coaching")}
+          </Link>
           <button
             type="button"
             onClick={openChat}
@@ -136,6 +146,15 @@ export function Header({ locale }: HeaderProps) {
           >
             <GraduationCap size={14} strokeWidth={1.5} />
             {t("courses")}
+          </Link>
+          <Link
+            href="/coaching"
+            className="flex items-center gap-2 text-sm py-2"
+            style={{ color: "var(--muted-foreground)" }}
+            onClick={() => setMenuOpen(false)}
+          >
+            <Rocket size={14} strokeWidth={1.5} />
+            {t("coaching")}
           </Link>
           <button
             type="button"
