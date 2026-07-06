@@ -363,7 +363,7 @@ export function CoachingLanding() {
             >
               {coachImgOk ? (
                 <Image
-                  src="/coaching/coach.jpg"
+                  src="/coaching/leo.jpg"
                   alt="Ton coach"
                   fill
                   sizes="160px"
