@@ -3,6 +3,7 @@
 import type { Palette } from "./palette";
 import type { DeskLink, DeskLinks, DeskTargetName } from "./links";
 import { Hotspot } from "./Hotspot";
+import { Callout } from "./Callout";
 
 interface DeskSceneProps {
   palette: Palette;
@@ -12,6 +13,19 @@ interface DeskSceneProps {
 }
 
 /**
+ * Géométrie des rappels (schéma en étoile) : point d'accroche sur l'objet et
+ * position du label déporté dans l'espace vide autour du bureau. Coordonnées
+ * locales de la scène (le groupe racine est décalé de y = -0.2).
+ */
+const CALLOUTS: Record<DeskTargetName, { anchor: [number, number, number]; to: [number, number, number] }> = {
+  monitor: { anchor: [0, 1.0, -0.42], to: [-0.2, 2.15, -0.5] },
+  plant: { anchor: [1.2, 0.62, -0.5], to: [2.7, 1.75, -0.5] },
+  phone: { anchor: [1.05, 0.5, 0.15], to: [2.9, 0.35, 0.2] },
+  books: { anchor: [-1.1, 0.5, -0.2], to: [-2.9, 1.15, -0.2] },
+  mug: { anchor: [-0.62, 0.42, 0.35], to: [-2.5, -0.35, 0.5] },
+};
+
+/**
  * Enveloppe un objet dans un Hotspot s'il porte un lien, sinon simple <group>.
  * Défini au niveau module (pas dans le render de DeskScene) pour ne pas
  * recréer le composant à chaque rendu et perdre l'état de survol.
@@ -19,33 +33,26 @@ interface DeskSceneProps {
 function DeskObject({
   name,
   links,
-  palette,
   onSelect,
   onHover,
   position,
   rotation,
-  labelY,
   children,
 }: {
   name: DeskTargetName;
   links?: DeskLinks;
-  palette: Palette;
   onSelect?: (link: DeskLink) => void;
   onHover?: (hovered: boolean) => void;
   position?: [number, number, number];
   rotation?: [number, number, number];
-  labelY?: number;
   children: React.ReactNode;
 }) {
   const link = links?.[name];
   if (link && onSelect) {
     return (
       <Hotspot
-        label={link.label}
-        palette={palette}
         position={position}
         rotation={rotation}
-        labelY={labelY}
         onSelect={() => onSelect(link)}
         onHover={onHover}
       >
@@ -69,7 +76,7 @@ function DeskObject({
  */
 export function DeskScene({ palette, links, onSelect, onHover }: DeskSceneProps) {
   // Raccourci : pré-remplit les props communes de DeskObject.
-  const objProps = { links, palette, onSelect, onHover };
+  const objProps = { links, onSelect, onHover };
 
   return (
     <group position={[0, -0.2, 0]}>
@@ -95,7 +102,7 @@ export function DeskScene({ palette, links, onSelect, onHover }: DeskSceneProps)
       </group>
 
       {/* ---- Écran (→ Projets) ---- */}
-      <DeskObject {...objProps} name="monitor" position={[0, 0, -0.5]} labelY={1.3}>
+      <DeskObject {...objProps} name="monitor" position={[0, 0, -0.5]}>
         <mesh position={[0, 0.09, 0]} castShadow>
           <boxGeometry args={[0.5, 0.04, 0.26]} />
           <meshStandardMaterial color={palette.deviceDark} roughness={0.6} />
@@ -134,7 +141,7 @@ export function DeskScene({ palette, links, onSelect, onHover }: DeskSceneProps)
       </group>
 
       {/* ---- Téléphone (→ Apps mobiles) ---- */}
-      <DeskObject {...objProps} name="phone" position={[1.02, 0, 0.15]} rotation={[0, -0.5, 0]} labelY={0.7}>
+      <DeskObject {...objProps} name="phone" position={[1.02, 0, 0.15]} rotation={[0, -0.5, 0]}>
         <mesh position={[0, 0.28, 0]} rotation={[-0.18, 0, 0]} castShadow>
           <boxGeometry args={[0.2, 0.4, 0.03]} />
           <meshStandardMaterial
@@ -147,7 +154,7 @@ export function DeskScene({ palette, links, onSelect, onHover }: DeskSceneProps)
       </DeskObject>
 
       {/* ---- Pile de livres (→ Coaching) ---- */}
-      <DeskObject {...objProps} name="books" position={[-1.15, 0, -0.2]} labelY={0.7}>
+      <DeskObject {...objProps} name="books" position={[-1.15, 0, -0.2]}>
         <mesh position={[0, 0.14, 0]} rotation={[0, 0.15, 0]} castShadow>
           <boxGeometry args={[0.72, 0.11, 0.52]} />
           <meshStandardMaterial color={palette.book1} roughness={0.8} />
@@ -163,7 +170,7 @@ export function DeskScene({ palette, links, onSelect, onHover }: DeskSceneProps)
       </DeskObject>
 
       {/* ---- Mug (→ Contact) ---- */}
-      <DeskObject {...objProps} name="mug" position={[-0.65, 0, 0.35]} labelY={0.6}>
+      <DeskObject {...objProps} name="mug" position={[-0.65, 0, 0.35]}>
         <mesh position={[0, 0.22, 0]} castShadow>
           <cylinderGeometry args={[0.13, 0.11, 0.28, 24]} />
           <meshStandardMaterial color={palette.mug} roughness={0.6} />
@@ -175,7 +182,7 @@ export function DeskScene({ palette, links, onSelect, onHover }: DeskSceneProps)
       </DeskObject>
 
       {/* ---- Plante (→ GitHub, si dispo) ---- */}
-      <DeskObject {...objProps} name="plant" position={[1.2, 0, -0.5]} labelY={0.9}>
+      <DeskObject {...objProps} name="plant" position={[1.2, 0, -0.5]}>
         <mesh position={[0, 0.19, 0]} castShadow>
           <cylinderGeometry args={[0.15, 0.12, 0.26, 20]} />
           <meshStandardMaterial color={palette.plantPot} roughness={0.85} />
@@ -185,6 +192,25 @@ export function DeskScene({ palette, links, onSelect, onHover }: DeskSceneProps)
           <meshStandardMaterial color={palette.plant} roughness={0.9} flatShading />
         </mesh>
       </DeskObject>
+
+      {/* ---- Rappels en étoile : ligne + label cliquable par objet ---- */}
+      {onSelect &&
+        links &&
+        (Object.keys(CALLOUTS) as DeskTargetName[]).map((name) => {
+          const link = links[name];
+          if (!link) return null;
+          const { anchor, to } = CALLOUTS[name];
+          return (
+            <Callout
+              key={name}
+              anchor={anchor}
+              to={to}
+              label={link.label}
+              palette={palette}
+              onSelect={() => onSelect(link)}
+            />
+          );
+        })}
     </group>
   );
 }

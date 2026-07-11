@@ -40,14 +40,14 @@ export function InteractiveDesk({ links }: { links?: DeskLinks }) {
   if (!enabled) return null;
 
   return (
-    <section className="mx-auto max-w-5xl px-6 pb-4" aria-label="Bureau interactif 3D">
+    <section className="mx-auto max-w-6xl px-6 pb-6" aria-label="Bureau interactif 3D">
       <p
         className="text-center text-xs font-mono"
         style={{ color: "var(--muted-foreground)" }}
       >
         {t("hint")}
       </p>
-      <div className="relative h-[440px] w-full">
+      <div className="relative h-[520px] w-full">
         <DeskCanvas links={links} />
       </div>
     </section>
