@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
+import { SkillsBackground } from "@/components/three/SkillsBackground";
 import {
   SiReact, SiNextdotjs, SiTypescript, SiJavascript, SiTailwindcss, SiFramer,
   SiVuedotjs, SiAngular, SiSvelte, SiAstro,
@@ -52,8 +53,10 @@ export function TechStack({ skills }: { skills: SkillItem[] }) {
   if (visibleGroups.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-10">
+    <section className="relative mx-auto max-w-5xl px-6 py-10">
+      <SkillsBackground />
       <motion.div
+        className="relative z-10"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
