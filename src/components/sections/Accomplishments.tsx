@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { boldMarkdown } from "@/lib/utils";
 
 interface Accomplishment {
@@ -22,12 +23,7 @@ export function Accomplishments({ items }: { items: Accomplishment[] }) {
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        <h2
-          className="text-xs font-mono font-semibold tracking-widest uppercase mb-6 pb-2 border-b"
-          style={{ color: "var(--muted-foreground)", borderColor: "var(--border)" }}
-        >
-          {t("title")}
-        </h2>
+        <SectionHeading>{t("title")}</SectionHeading>
 
         <ul className="space-y-4">
           {items.map((item, i) => (

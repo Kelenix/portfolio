@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { SkillsBackground } from "@/components/three/SkillsBackground";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ICON_MAP } from "@/components/three/skillIcons";
 
 export type SkillCategory = "frontend" | "backend" | "devops" | "tools";
@@ -39,12 +40,7 @@ export function TechStack({ skills }: { skills: SkillItem[] }) {
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        <h2
-          className="text-xs font-mono font-semibold tracking-widest uppercase mb-6 pb-2 border-b"
-          style={{ color: "var(--muted-foreground)", borderColor: "var(--border)" }}
-        >
-          {t("title")}
-        </h2>
+        <SectionHeading>{t("title")}</SectionHeading>
 
         {/* Desktop : constellation 3D des compétences */}
         <div className="relative hidden h-[380px] md:block">

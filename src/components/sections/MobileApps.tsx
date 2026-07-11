@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import Image from "next/image";
 import { FaGooglePlay, FaApple } from "react-icons/fa";
 
@@ -28,12 +29,7 @@ export function MobileApps({ items }: { items: MobileAppItem[] }) {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <h2
-            className="text-xs font-mono font-semibold tracking-widest uppercase mb-6 pb-2 border-b"
-            style={{ color: "var(--muted-foreground)", borderColor: "var(--border)" }}
-          >
-            {t("title")}
-          </h2>
+          <SectionHeading>{t("title")}</SectionHeading>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {items.map((app, i) => (

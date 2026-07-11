@@ -36,6 +36,12 @@ export function Header({ locale }: HeaderProps) {
 
   const isActive = (href: string) => pathname === href;
 
+  // Lien de nav avec souligné animé (se déploie de la gauche au survol, plein si actif).
+  const navLink = (href: string, extra = "") =>
+    `relative pb-0.5 text-sm transition-opacity after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100 ${
+      isActive(href) ? "after:scale-x-100" : "after:scale-x-0"
+    } ${extra}`;
+
   const openChat = () => {
     if (typeof window !== "undefined") {
       window.dispatchEvent(new Event(OPEN_CHAT_EVENT));
@@ -65,7 +71,7 @@ export function Header({ locale }: HeaderProps) {
         <nav className="hidden md:flex items-center gap-6">
           <Link
             href="/blog"
-            className="text-sm transition-opacity hover:opacity-70"
+            className={navLink("/blog")}
             style={{
               color: isActive("/blog") ? "var(--foreground)" : "var(--muted-foreground)",
             }}
@@ -74,7 +80,7 @@ export function Header({ locale }: HeaderProps) {
           </Link>
           <Link
             href="/courses"
-            className="flex items-center gap-1.5 text-sm transition-opacity hover:opacity-70"
+            className={navLink("/courses", "flex items-center gap-1.5")}
             style={{
               color: isActive("/courses") ? "var(--foreground)" : "var(--muted-foreground)",
             }}
@@ -84,7 +90,7 @@ export function Header({ locale }: HeaderProps) {
           </Link>
           <Link
             href="/coaching"
-            className="flex items-center gap-1.5 text-sm transition-opacity hover:opacity-70"
+            className={navLink("/coaching", "flex items-center gap-1.5")}
             style={{
               color: isActive("/coaching") ? "var(--foreground)" : "var(--muted-foreground)",
             }}
