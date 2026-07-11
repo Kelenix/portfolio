@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { Link } from "@/i18n/navigation";
 import { Markdown, stripMarkdown } from "@/lib/markdown";
 import {
@@ -115,9 +116,9 @@ export default async function BlogPostPage({
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
-      <script
+      <Script
+        id="blogpost-jsonld"
         type="application/ld+json"
-        suppressHydrationWarning
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Link

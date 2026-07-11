@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { getLocale } from "next-intl/server";
+import Script from "next/script";
 import { Hero } from "@/components/sections/Hero";
+import { InteractiveDesk } from "@/components/three/InteractiveDesk";
 import { Accomplishments } from "@/components/sections/Accomplishments";
 import { Projects } from "@/components/sections/Projects";
 import { MobileApps } from "@/components/sections/MobileApps";
@@ -39,25 +41,35 @@ export default async function HomePage() {
   const isEn = locale === "en";
   const isIt = locale === "it";
 
+  // Chaque requête a son propre fallback : si la base est injoignable, la page
+  // s'affiche quand même (sections vides) au lieu de renvoyer une 500.
   const [profile, socials, accomplishments, projects, mobileApps, skills] = await Promise.all([
-    prisma.profile.findFirst({ where: { id: "default" } }),
-    prisma.socialLink.findMany({ orderBy: { order: "asc" } }),
-    prisma.accomplishment.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-    }),
-    prisma.project.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-    }),
-    prisma.mobileApp.findMany({
-      where: { published: true },
-      orderBy: { order: "asc" },
-    }),
-    prisma.skill.findMany({
-      where: { published: true },
-      orderBy: [{ category: "asc" }, { order: "asc" }],
-    }),
+    prisma.profile.findFirst({ where: { id: "default" } }).catch(() => null),
+    prisma.socialLink.findMany({ orderBy: { order: "asc" } }).catch(() => []),
+    prisma.accomplishment
+      .findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+      })
+      .catch(() => []),
+    prisma.project
+      .findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+      })
+      .catch(() => []),
+    prisma.mobileApp
+      .findMany({
+        where: { published: true },
+        orderBy: { order: "asc" },
+      })
+      .catch(() => []),
+    prisma.skill
+      .findMany({
+        where: { published: true },
+        orderBy: [{ category: "asc" }, { order: "asc" }],
+      })
+      .catch(() => []),
   ]);
 
   const profileData = {
@@ -156,17 +168,18 @@ export default async function HomePage() {
 
   return (
     <>
-      <script
+      <Script
+        id="person-jsonld"
         type="application/ld+json"
-        suppressHydrationWarning
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
       />
-      <script
+      <Script
+        id="website-jsonld"
         type="application/ld+json"
-        suppressHydrationWarning
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
       />
       <Hero profile={profileData} />
+      <InteractiveDesk />
       <Accomplishments items={accomplishmentItems} />
       <Projects items={projectItems} />
       <MobileApps items={mobileAppItems} />

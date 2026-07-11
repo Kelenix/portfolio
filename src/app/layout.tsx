@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { getSiteUrl, SITE_NAME } from "@/lib/seo";
 import "./globals.css";
 
@@ -56,17 +57,13 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html suppressHydrationWarning data-scroll-behavior="smooth">
-      <head>
-        <script
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme')||'dark';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);d?document.documentElement.classList.add('dark'):document.documentElement.classList.remove('dark')}catch(e){}})()`,
-          }}
-        />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased`}
       >
+        {/* Script externe (pas inline) exécuté avant l'hydratation : applique le
+            thème avant le premier paint sans déclencher le warning « script tag »
+            de React 19 (qui ne concerne que les scripts inline). */}
+        <Script src="/theme-init.js" strategy="beforeInteractive" />
         {children}
       </body>
     </html>
