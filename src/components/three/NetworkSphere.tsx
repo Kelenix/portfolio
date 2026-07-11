@@ -8,7 +8,7 @@ import type { IconType } from "react-icons";
 import { clamp01, lerp } from "./animation";
 import { ICON_MAP, type SkillNode } from "./skillIcons";
 
-const R = 2.3; // rayon
+const R = 2.85; // rayon
 const NEIGHBORS = 3; // arêtes par nœud
 
 interface NetworkSphereProps {
@@ -19,7 +19,7 @@ interface NetworkSphereProps {
   lineOpacity: number;
 }
 
-/** Pastille DOM (icône seule, nom au survol) accrochée à un nœud. */
+/** Étiquette DOM (icône + nom, façon nuage de tags) accrochée à un nœud. */
 function IconChip({ icon: Icon, name }: { icon?: IconType; name: string }) {
   const [hovered, setHovered] = useState(false);
   return (
@@ -29,23 +29,20 @@ function IconChip({ icon: Icon, name }: { icon?: IconType; name: string }) {
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 6,
-        padding: hovered ? "4px 10px" : "5px",
-        borderRadius: 9999,
-        background: "var(--background)",
-        border: "1px solid var(--border)",
-        color: "var(--foreground)",
+        gap: 5,
         fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: 600,
         whiteSpace: "nowrap",
-        boxShadow: "0 1px 6px rgba(0,0,0,0.12)",
+        color: hovered ? "var(--foreground)" : "var(--muted-foreground)",
+        transform: hovered ? "scale(1.14)" : "scale(1)",
+        transition: "transform 0.15s ease, color 0.15s ease",
         cursor: "default",
-        transition: "padding 0.15s ease",
+        userSelect: "none",
       }}
     >
-      {Icon && <Icon size={14} style={{ color: "var(--muted-foreground)", flexShrink: 0 }} />}
-      {hovered && <span>{name}</span>}
+      {Icon && <Icon size={15} style={{ flexShrink: 0 }} />}
+      <span>{name}</span>
     </div>
   );
 }

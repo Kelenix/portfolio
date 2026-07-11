@@ -32,10 +32,8 @@ export function TechStack({ skills }: { skills: SkillItem[] }) {
   if (visibleGroups.length === 0) return null;
 
   return (
-    <section className="relative mx-auto max-w-5xl px-6 py-10">
-      <SkillsBackground skills={skills} />
+    <section className="mx-auto max-w-5xl px-6 py-10">
       <motion.div
-        className="relative z-10"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -48,7 +46,13 @@ export function TechStack({ skills }: { skills: SkillItem[] }) {
           {t("title")}
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+        {/* Desktop : constellation 3D des compétences */}
+        <div className="relative hidden h-[520px] md:block">
+          <SkillsBackground skills={skills} />
+        </div>
+
+        {/* Mobile : grille de badges (fallback + SEO préservé dans le HTML) */}
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:hidden">
           {visibleGroups.map((group, gi) => (
             <motion.div
               key={group}
