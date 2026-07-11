@@ -88,10 +88,11 @@ export function TechStack({ skills }: { skills: SkillItem[] }) {
                     <motion.div
                       key={skill.id}
                       initial={{ opacity: 0, scale: 0.9 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
+                      whileInView={{ opacity: 1, scale: 1, transition: { delay: gi * 0.05 + i * 0.04, duration: 0.3 } }}
                       viewport={{ once: true }}
-                      transition={{ delay: gi * 0.05 + i * 0.04, duration: 0.3 }}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-mono cursor-default transition-colors duration-150"
+                      whileHover={{ y: -3, scale: 1.06 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-mono cursor-default"
                       style={{
                         borderColor: "var(--border)",
                         background: "var(--muted)",

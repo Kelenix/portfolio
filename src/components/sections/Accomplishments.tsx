@@ -34,9 +34,10 @@ export function Accomplishments({ items }: { items: Accomplishment[] }) {
             <motion.li
               key={item.id}
               initial={{ opacity: 0, x: -10 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              whileInView={{ opacity: 1, x: 0, transition: { delay: i * 0.08, duration: 0.4 } }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.08, duration: 0.4 }}
+              whileHover={{ x: 6 }}
+              transition={{ type: "spring", stiffness: 400, damping: 26 }}
               className="flex items-start gap-3 text-base leading-relaxed"
               style={{ color: "var(--muted-foreground)" }}
             >

@@ -47,10 +47,11 @@ export function Projects({ items }: { items: Project[] }) {
                 <motion.div
                   key={project.id}
                   initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  whileInView={{ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.4 } }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.08, duration: 0.4 }}
-                  className="group relative p-5 rounded-lg border transition-all duration-200 hover:border-opacity-80"
+                  whileHover={{ y: -6 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 26 }}
+                  className="group relative p-5 rounded-lg border transition-shadow duration-200 hover:shadow-lg"
                   style={{
                     background: "var(--background)",
                     borderColor: "var(--border)",
@@ -67,7 +68,7 @@ export function Projects({ items }: { items: Project[] }) {
                           alt={project.title}
                           fill
                           sizes="56px"
-                          className="object-cover"
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                       ) : (
                         <FolderOpen
