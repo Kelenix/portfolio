@@ -1,6 +1,7 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { NetworkSphere } from "./NetworkSphere";
 import type { SkillNode } from "./skillIcons";
@@ -17,7 +18,7 @@ export default function SkillsCanvas({ skills }: { skills: SkillNode[] }) {
     <Canvas
       dpr={[1, 1.5]}
       gl={{ alpha: true, antialias: true }}
-      camera={{ position: [0, 0, 7.8], fov: 50 }}
+      camera={{ position: [0, 2.1, 6.4], fov: 50 }}
     >
       <NetworkSphere
         skills={skills}
@@ -25,6 +26,14 @@ export default function SkillsCanvas({ skills }: { skills: SkillNode[] }) {
         lineColor={dark ? "#3f3f46" : "#e0e0e3"}
         pointOpacity={dark ? 0.6 : 0.7}
         lineOpacity={dark ? 0.22 : 0.35}
+      />
+      <OrbitControls
+        enablePan={false}
+        enableZoom={false}
+        autoRotate
+        autoRotateSpeed={0.6}
+        minPolarAngle={Math.PI / 3.2}
+        maxPolarAngle={Math.PI / 2.05}
       />
     </Canvas>
   );

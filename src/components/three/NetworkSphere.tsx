@@ -1,15 +1,19 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import { Group, Vector3 } from "three";
 import type { IconType } from "react-icons";
-import { clamp01, lerp } from "./animation";
+import { clamp01 } from "./animation";
 import { ICON_MAP, type SkillNode } from "./skillIcons";
 
-const R = 2.85; // rayon
-const NEIGHBORS = 3; // arêtes par nœud
+const R = 2.85; // rayon de base
+// Facteurs de forme : disque large et aplati (remplit un rectangle large/court).
+const SX = 1.55;
+const SY = 0.62;
+const SZ = 1.55;
+const NEIGHBORS = 3;
 
 interface NetworkSphereProps {
   skills: SkillNode[];
@@ -21,11 +25,8 @@ interface NetworkSphereProps {
 
 /** Étiquette DOM (icône + nom, façon nuage de tags) accrochée à un nœud. */
 function IconChip({ icon: Icon, name }: { icon?: IconType; name: string }) {
-  const [hovered, setHovered] = useState(false);
   return (
     <div
-      onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
       style={{
         display: "flex",
         alignItems: "center",
@@ -34,14 +35,12 @@ function IconChip({ icon: Icon, name }: { icon?: IconType; name: string }) {
         fontSize: 12,
         fontWeight: 600,
         whiteSpace: "nowrap",
-        color: hovered ? "var(--foreground)" : "var(--muted-foreground)",
-        transform: hovered ? "scale(1.14)" : "scale(1)",
-        transition: "transform 0.15s ease, color 0.15s ease",
-        cursor: "default",
+        color: "var(--foreground)",
         userSelect: "none",
+        pointerEvents: "none",
       }}
     >
-      {Icon && <Icon size={15} style={{ flexShrink: 0 }} />}
+      {Icon && <Icon size={15} style={{ flexShrink: 0, color: "var(--muted-foreground)" }} />}
       <span>{name}</span>
     </div>
   );
@@ -49,8 +48,8 @@ function IconChip({ icon: Icon, name }: { icon?: IconType; name: string }) {
 
 /**
  * Constellation de compétences : chaque tech est accrochée à un nœud réparti sur
- * une sphère (Fibonacci), reliés entre voisins. Rotation lente + parallaxe. Les
- * nœuds à l'arrière sont estompés pour rester lisible.
+ * un ellipsoïde aplati (disque). La caméra tourne (auto + drag souris via
+ * OrbitControls) ; les nœuds orientés vers l'arrière sont estompés.
  */
 export function NetworkSphere({
   skills,
@@ -61,7 +60,8 @@ export function NetworkSphere({
 }: NetworkSphereProps) {
   const group = useRef<Group>(null);
   const chipRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const tmp = useRef(new Vector3());
+  const nodeDir = useRef(new Vector3());
+  const camDir = useRef(new Vector3());
   const N = skills.length;
 
   const { pts, pointPositions, linePositions } = useMemo(() => {
@@ -71,7 +71,7 @@ export function NetworkSphere({
       const y = N > 1 ? 1 - (i / (N - 1)) * 2 : 0;
       const r = Math.sqrt(Math.max(0, 1 - y * y));
       const th = i * golden;
-      pts.push([Math.cos(th) * r * R, y * R, Math.sin(th) * r * R]);
+      pts.push([Math.cos(th) * r * R * SX, y * R * SY, Math.sin(th) * r * R * SZ]);
     }
 
     const pointPositions = new Float32Array(N * 3);
@@ -105,24 +105,17 @@ export function NetworkSphere({
     return { pts, pointPositions, linePositions };
   }, [N]);
 
-  useFrame((state, delta) => {
-    if (!group.current) return;
-    group.current.rotation.y += delta * 0.07;
-    group.current.rotation.x = lerp(
-      group.current.rotation.x,
-      -state.pointer.y * 0.12,
-      0.04
-    );
-    // Estompe les nœuds orientés vers l'arrière (z < 0 après rotation).
-    const rot = group.current.rotation;
+  useFrame((state) => {
+    // Estompe les nœuds orientés à l'opposé de la caméra (dot < 0).
+    const cd = camDir.current.copy(state.camera.position).normalize();
     for (let i = 0; i < N; i++) {
       const el = chipRefs.current[i];
       if (!el) continue;
-      tmp.current.set(pts[i][0], pts[i][1], pts[i][2]).applyEuler(rot);
-      const zn = tmp.current.z / R; // -1 (arrière) .. 1 (avant)
-      const o = clamp01((zn + 0.2) / 1.0);
-      el.style.opacity = String(0.12 + 0.88 * o);
-      el.style.pointerEvents = zn > 0 ? "auto" : "none";
+      const f = nodeDir.current
+        .set(pts[i][0], pts[i][1], pts[i][2])
+        .normalize()
+        .dot(cd);
+      el.style.opacity = String(0.1 + 0.9 * clamp01((f + 0.15) / 1.0));
     }
   });
 
@@ -150,8 +143,8 @@ export function NetworkSphere({
       </points>
 
       {pts.map((p, i) => (
-        <Html key={i} position={p} center zIndexRange={[50, 0]}>
-          <div ref={(el) => { chipRefs.current[i] = el; }}>
+        <Html key={i} position={p} center zIndexRange={[50, 0]} style={{ pointerEvents: "none" }}>
+          <div ref={(el) => { chipRefs.current[i] = el; }} style={{ pointerEvents: "none" }}>
             <IconChip icon={ICON_MAP[skills[i].iconName]} name={skills[i].name} />
           </div>
         </Html>

@@ -47,7 +47,7 @@ export function TechStack({ skills }: { skills: SkillItem[] }) {
         </h2>
 
         {/* Desktop : constellation 3D des compétences */}
-        <div className="relative hidden h-[520px] md:block">
+        <div className="relative hidden h-[380px] md:block">
           <SkillsBackground skills={skills} />
         </div>
 
