@@ -33,6 +33,7 @@ export function Callout({
   drawDuration = 0.4,
 }: CalloutProps) {
   const [hovered, setHovered] = useState(false);
+  const [pressed, setPressed] = useState(false);
   const [started, setStarted] = useState(false);
   const [pill, setPill] = useState(false);
   const [end, setEnd] = useState<[number, number, number]>(anchor);
@@ -80,7 +81,12 @@ export function Callout({
             onSelect();
           }}
           onPointerOver={() => setHovered(true)}
-          onPointerOut={() => setHovered(false)}
+          onPointerOut={() => {
+            setHovered(false);
+            setPressed(false);
+          }}
+          onPointerDown={() => setPressed(true)}
+          onPointerUp={() => setPressed(false)}
           style={{
             fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
             fontSize: "12px",
@@ -97,7 +103,9 @@ export function Callout({
             boxShadow: hovered
               ? "0 4px 16px rgba(0,0,0,0.28)"
               : "0 2px 10px rgba(0,0,0,0.18)",
-            transform: `scale(${pill ? (hovered ? 1.07 : 1) : 0.6})`,
+            transform: `scale(${
+              pill ? (pressed ? 0.92 : hovered ? 1.07 : 1) : 0.6
+            })`,
             transition: "transform 0.2s ease, opacity 0.25s ease, box-shadow 0.15s ease",
           }}
         >

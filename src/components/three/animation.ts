@@ -27,3 +27,14 @@ export function easeOutBack(t: number): number {
 export function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - t, 3);
 }
+
+// Multiplicateur d'échelle pour l'effet « press » au clic : l'objet se comprime
+// puis rebondit. Renvoie 1 hors de la fenêtre d'animation.
+export function clickPulse(dt: number): number {
+  const DUR = 0.4;
+  const DOWN = 0.1;
+  if (dt < 0 || dt > DUR) return 1;
+  if (dt < DOWN) return 1 - 0.15 * (dt / DOWN); // 1 → 0.85
+  const p = (dt - DOWN) / (DUR - DOWN);
+  return 0.85 + 0.15 * easeOutBack(p); // 0.85 → ~1 avec léger dépassement
+}

@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useCursor } from "@react-three/drei";
 import type { Group } from "three";
-import { clamp01, easeOutBack, lerp } from "./animation";
+import { clamp01, easeOutBack, lerp, clickPulse } from "./animation";
 
 interface HotspotProps {
   onSelect: () => void;
@@ -18,9 +18,8 @@ interface HotspotProps {
 }
 
 /**
- * Objet interactif : apparition en pop (scale 0 → 1), curseur pointeur + léger
- * agrandissement lissé au survol, clic → onSelect(). Le libellé est géré par
- * les <Callout>.
+ * Objet interactif : apparition en pop, survol lissé, et « press » au clic
+ * (compression + rebond) avant la navigation. Le libellé est géré par <Callout>.
  */
 export function Hotspot({
   onSelect,
@@ -33,22 +32,24 @@ export function Hotspot({
 }: HotspotProps) {
   const ref = useRef<Group>(null);
   const start = useRef<number | null>(null);
+  const now = useRef(0);
+  const clickTime = useRef(-999);
+  const hoverScale = useRef(1);
   const hoveredRef = useRef(false);
   const [hovered, setHovered] = useState(false);
   useCursor(hovered);
 
   useFrame((state) => {
     if (!ref.current) return;
-    if (start.current === null) start.current = state.clock.elapsedTime;
-    const p = clamp01((state.clock.elapsedTime - start.current - delay) / duration);
-    if (p < 1) {
-      // Phase d'entrée : on suit la courbe de pop directement.
-      ref.current.scale.setScalar(easeOutBack(p));
-    } else {
-      // Après l'entrée : lissage vers l'échelle de survol.
-      const target = hoveredRef.current ? 1.08 : 1;
-      ref.current.scale.setScalar(lerp(ref.current.scale.x, target, 0.2));
-    }
+    const t = state.clock.elapsedTime;
+    now.current = t;
+    if (start.current === null) start.current = t;
+    const p = clamp01((t - start.current - delay) / duration);
+    const appear = easeOutBack(p);
+    const hoverTarget = hoveredRef.current ? 1.08 : 1;
+    hoverScale.current = lerp(hoverScale.current, hoverTarget, 0.2);
+    const pulse = clickPulse(t - clickTime.current);
+    ref.current.scale.setScalar(appear * hoverScale.current * pulse);
   });
 
   const setHover = (v: boolean) => {
@@ -73,7 +74,8 @@ export function Hotspot({
       }}
       onClick={(e) => {
         e.stopPropagation();
-        onSelect();
+        clickTime.current = now.current; // déclenche le rebond
+        window.setTimeout(onSelect, 150); // laisse voir l'effet avant navigation
       }}
     >
       {children}
