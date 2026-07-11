@@ -17,6 +17,9 @@ export interface Palette {
   plantPot: string;
   plant: string;
   shadow: string;
+  /** Couleurs du petit label (pastille) affiché au survol d'un objet. */
+  labelBg: string;
+  labelText: string;
 }
 
 export function getPalette(dark: boolean): Palette {
@@ -36,6 +39,8 @@ export function getPalette(dark: boolean): Palette {
         plantPot: "#52525b",
         plant: "#a1a1aa",
         shadow: "#000000",
+        labelBg: "#ffffff",
+        labelText: "#000000",
       }
     : {
         deskTop: "#e4e4e7",
@@ -52,5 +57,7 @@ export function getPalette(dark: boolean): Palette {
         plantPot: "#71717a",
         plant: "#52525b",
         shadow: "#111827",
+        labelBg: "#111827",
+        labelText: "#ffffff",
       };
 }

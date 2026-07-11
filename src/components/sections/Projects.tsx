@@ -22,7 +22,8 @@ export function Projects({ items }: { items: Project[] }) {
 
   return (
     <section
-      className="py-10"
+      id="projets"
+      className="scroll-mt-20 py-10"
       style={{ background: "var(--muted)" }}
     >
       <div className="mx-auto max-w-5xl px-6">

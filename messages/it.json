@@ -1,4 +1,7 @@
 {
+  "desk": {
+    "hint": "Passa sugli oggetti, clicca per esplorare"
+  },
   "nav": {
     "blog": "Blog",
     "admin": "Admin",

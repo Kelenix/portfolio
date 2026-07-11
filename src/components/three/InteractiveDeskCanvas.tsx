@@ -1,19 +1,41 @@
 "use client";
 
+import { useCallback, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, ContactShadows } from "@react-three/drei";
+import { useRouter } from "next/navigation";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { DeskScene } from "./DeskScene";
 import { getPalette } from "./palette";
+import type { DeskLink, DeskLinks } from "./links";
 
 /**
  * Wrapper <Canvas> de la scène. Chargé dynamiquement (ssr:false) par
  * InteractiveDesk pour ne jamais peser sur le rendu serveur ni le SEO.
  */
-export default function InteractiveDeskCanvas() {
+export default function InteractiveDeskCanvas({ links }: { links?: DeskLinks }) {
   const { theme } = useTheme();
   const dark = theme === "dark";
   const palette = getPalette(dark);
+  const router = useRouter();
+
+  // Rotation auto en pause tant qu'un objet est survolé (confort de clic).
+  const [interacting, setInteracting] = useState(false);
+
+  const handleSelect = useCallback(
+    (link: DeskLink) => {
+      if (link.kind === "anchor") {
+        document
+          .getElementById(link.href)
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else if (link.kind === "route") {
+        router.push(link.href);
+      } else {
+        window.open(link.href, "_blank", "noopener,noreferrer");
+      }
+    },
+    [router]
+  );
 
   return (
     <Canvas
@@ -37,7 +59,12 @@ export default function InteractiveDeskCanvas() {
       />
       <directionalLight position={[-4, 2, -3]} intensity={dark ? 0.35 : 0.3} />
 
-      <DeskScene palette={palette} />
+      <DeskScene
+        palette={palette}
+        links={links}
+        onSelect={handleSelect}
+        onHover={setInteracting}
+      />
 
       <ContactShadows
         position={[0, -1.14, 0]}
@@ -51,7 +78,7 @@ export default function InteractiveDeskCanvas() {
       <OrbitControls
         enablePan={false}
         enableZoom={false}
-        autoRotate
+        autoRotate={!interacting}
         autoRotateSpeed={0.8}
         minPolarAngle={Math.PI / 3.4}
         maxPolarAngle={Math.PI / 2.1}

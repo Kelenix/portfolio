@@ -9,7 +9,8 @@ export function Contact({ email }: { email: string }) {
 
   return (
     <section
-      className="py-12"
+      id="contact"
+      className="scroll-mt-20 py-12"
       style={{ background: "var(--muted)" }}
     >
       <div className="mx-auto max-w-5xl px-6">

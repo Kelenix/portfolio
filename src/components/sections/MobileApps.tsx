@@ -20,7 +20,7 @@ export function MobileApps({ items }: { items: MobileAppItem[] }) {
   if (items.length === 0) return null;
 
   return (
-    <section className="py-10">
+    <section id="apps" className="scroll-mt-20 py-10">
       <div className="mx-auto max-w-5xl px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

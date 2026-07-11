@@ -3,6 +3,7 @@ import { getLocale } from "next-intl/server";
 import Script from "next/script";
 import { Hero } from "@/components/sections/Hero";
 import { InteractiveDesk } from "@/components/three/InteractiveDesk";
+import type { DeskLinks } from "@/components/three/links";
 import { Accomplishments } from "@/components/sections/Accomplishments";
 import { Projects } from "@/components/sections/Projects";
 import { MobileApps } from "@/components/sections/MobileApps";
@@ -123,6 +124,33 @@ export default async function HomePage() {
     appStoreUrl: a.appStoreUrl,
   }));
 
+  // Liens des objets cliquables du bureau 3D, construits depuis la vraie data.
+  const deskLabels = (
+    {
+      fr: { monitor: "Projets", phone: "Applications", books: "Coaching", mug: "Me contacter" },
+      en: { monitor: "Projects", phone: "Apps", books: "Coaching", mug: "Contact me" },
+      it: { monitor: "Progetti", phone: "App", books: "Coaching", mug: "Contattami" },
+    } as const
+  )[isEn ? "en" : isIt ? "it" : "fr"];
+
+  const githubSocial = profileData.socials.find(
+    (s) => s.platform.toLowerCase() === "github"
+  );
+
+  const deskLinks: DeskLinks = {
+    ...(projectItems.length > 0 && {
+      monitor: { label: deskLabels.monitor, kind: "anchor", href: "projets" },
+    }),
+    ...(mobileAppItems.length > 0 && {
+      phone: { label: deskLabels.phone, kind: "anchor", href: "apps" },
+    }),
+    books: { label: deskLabels.books, kind: "route", href: localizedPath(locale, "/coaching") },
+    mug: { label: deskLabels.mug, kind: "anchor", href: "contact" },
+    ...(githubSocial && {
+      plant: { label: "GitHub", kind: "external", href: githubSocial.url },
+    }),
+  };
+
   const siteUrl = getSiteUrl();
   const homeUrl = localizedPath(locale, "/");
 
@@ -179,7 +207,7 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
       />
       <Hero profile={profileData} />
-      <InteractiveDesk />
+      <InteractiveDesk links={deskLinks} />
       <Accomplishments items={accomplishmentItems} />
       <Projects items={projectItems} />
       <MobileApps items={mobileAppItems} />
