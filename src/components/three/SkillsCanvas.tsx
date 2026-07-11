@@ -3,12 +3,13 @@
 import { Canvas } from "@react-three/fiber";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { NetworkSphere } from "./NetworkSphere";
+import type { SkillNode } from "./skillIcons";
 
 /**
- * Canvas décoratif de fond pour la section Compétences. Non éclairé, monochrome,
- * discret. Chargé dynamiquement (ssr:false) par SkillsBackground.
+ * Canvas de la constellation de compétences. Non éclairé, monochrome. Chargé
+ * dynamiquement (ssr:false) par SkillsBackground.
  */
-export default function SkillsCanvas() {
+export default function SkillsCanvas({ skills }: { skills: SkillNode[] }) {
   const { theme } = useTheme();
   const dark = theme === "dark";
 
@@ -19,6 +20,7 @@ export default function SkillsCanvas() {
       camera={{ position: [0, 0, 6.5], fov: 50 }}
     >
       <NetworkSphere
+        skills={skills}
         pointColor={dark ? "#71717a" : "#a1a1aa"}
         lineColor={dark ? "#3f3f46" : "#d4d4d8"}
         pointOpacity={dark ? 0.85 : 0.9}

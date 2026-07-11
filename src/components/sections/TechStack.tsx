@@ -3,28 +3,7 @@
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { SkillsBackground } from "@/components/three/SkillsBackground";
-import {
-  SiReact, SiNextdotjs, SiTypescript, SiJavascript, SiTailwindcss, SiFramer,
-  SiVuedotjs, SiAngular, SiSvelte, SiAstro,
-  SiNodedotjs, SiPrisma, SiPostgresql, SiMongodb, SiMysql, SiSqlite, SiGraphql,
-  SiPython, SiDjango, SiPhp, SiLaravel, SiRust, SiGo, SiRedis, SiSupabase, SiFirebase,
-  SiDocker, SiKubernetes, SiVercel, SiGithubactions, SiGit, SiNginx, SiLinux,
-  SiGooglecloud,
-  SiFigma, SiPostman, SiGithub, SiNotion, SiJira,
-} from "react-icons/si";
-import { TbApi, TbBrandVscode } from "react-icons/tb";
-import type { IconType } from "react-icons";
-
-export const ICON_MAP: Record<string, IconType> = {
-  SiReact, SiNextdotjs, SiTypescript, SiJavascript, SiTailwindcss, SiFramer,
-  SiVuedotjs, SiAngular, SiSvelte, SiAstro,
-  SiNodedotjs, SiPrisma, SiPostgresql, SiMongodb, SiMysql, SiSqlite, SiGraphql,
-  SiPython, SiDjango, SiPhp, SiLaravel, SiRust, SiGo, SiRedis, SiSupabase, SiFirebase,
-  SiDocker, SiKubernetes, SiVercel, SiGithubactions, SiGit, SiNginx, SiLinux,
-  SiGooglecloud,
-  SiFigma, SiPostman, SiGithub, SiNotion, SiJira,
-  TbBrandVscode, TbApi,
-};
+import { ICON_MAP } from "@/components/three/skillIcons";
 
 export type SkillCategory = "frontend" | "backend" | "devops" | "tools";
 
@@ -54,7 +33,7 @@ export function TechStack({ skills }: { skills: SkillItem[] }) {
 
   return (
     <section className="relative mx-auto max-w-5xl px-6 py-10">
-      <SkillsBackground />
+      <SkillsBackground skills={skills} />
       <motion.div
         className="relative z-10"
         initial={{ opacity: 0, y: 20 }}
