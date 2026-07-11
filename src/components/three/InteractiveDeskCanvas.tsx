@@ -43,7 +43,7 @@ export default function InteractiveDeskCanvas({ links }: { links?: DeskLinks }) 
       shadows
       dpr={[1, 1.5]}
       gl={{ alpha: true, antialias: true }}
-      camera={{ position: [0.9, 2.0, 6.2], fov: 46 }}
+      camera={{ position: [0, 2.0, 6.4], fov: 46 }}
     >
       {/* Éclairage adapté au thème (pas d'HDR externe → self-contained) */}
       <ambientLight intensity={dark ? 0.45 : 0.7} />
