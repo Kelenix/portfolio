@@ -1,10 +1,31 @@
 "use client";
 
+import { useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import type { Group } from "three";
 import type { Palette } from "./palette";
 import type { DeskLink, DeskLinks, DeskTargetName } from "./links";
 import { Hotspot } from "./Hotspot";
 import { Callout } from "./Callout";
 import { Appear } from "./Appear";
+import { ScreenContent } from "./ScreenContent";
+import { lerp } from "./animation";
+
+/**
+ * Incline doucement toute la scène vers le curseur (parallaxe). Les callouts
+ * étant à l'intérieur, lignes et labels restent solidaires du bureau.
+ */
+function ParallaxGroup({ children }: { children: React.ReactNode }) {
+  const ref = useRef<Group>(null);
+  useFrame((state) => {
+    if (!ref.current) return;
+    const targetY = state.pointer.x * 0.22;
+    const targetX = -state.pointer.y * 0.1;
+    ref.current.rotation.y = lerp(ref.current.rotation.y, targetY, 0.05);
+    ref.current.rotation.x = lerp(ref.current.rotation.x, targetX, 0.05);
+  });
+  return <group ref={ref}>{children}</group>;
+}
 
 interface DeskSceneProps {
   palette: Palette;
@@ -95,7 +116,8 @@ export function DeskScene({ palette, links, onSelect, onHover }: DeskSceneProps)
   const objProps = { links, onSelect, onHover };
 
   return (
-    <group position={[0, -0.2, 0]}>
+    <ParallaxGroup>
+      <group position={[0, -0.2, 0]}>
       {/* ---- Plateau + pieds (décor) ---- */}
       <Appear delay={0} duration={0.6}>
         <mesh castShadow receiveShadow>
@@ -141,6 +163,8 @@ export function DeskScene({ palette, links, onSelect, onHover }: DeskSceneProps)
               roughness={0.3}
             />
           </mesh>
+          {/* Écran vivant : lignes de code qui défilent + curseur */}
+          <ScreenContent palette={palette} position={[0, 0, 0.05]} />
         </group>
       </DeskObject>
 
@@ -228,6 +252,7 @@ export function DeskScene({ palette, links, onSelect, onHover }: DeskSceneProps)
             />
           );
         })}
-    </group>
+      </group>
+    </ParallaxGroup>
   );
 }

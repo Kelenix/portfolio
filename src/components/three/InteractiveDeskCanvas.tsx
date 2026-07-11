@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows } from "@react-three/drei";
+import { ContactShadows } from "@react-three/drei";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { DeskScene } from "./DeskScene";
@@ -44,6 +44,7 @@ export default function InteractiveDeskCanvas({ links }: { links?: DeskLinks }) 
       dpr={[1, 1.5]}
       gl={{ alpha: true, antialias: true }}
       camera={{ position: [0, 2.0, 6.4], fov: 46 }}
+      onCreated={({ camera }) => camera.lookAt(0, 0.4, 0)}
     >
       {/* Éclairage adapté au thème (pas d'HDR externe → self-contained) */}
       <ambientLight intensity={dark ? 0.45 : 0.7} />
@@ -69,17 +70,6 @@ export default function InteractiveDeskCanvas({ links }: { links?: DeskLinks }) 
         far={3}
         opacity={dark ? 0.5 : 0.35}
         color={palette.shadow}
-      />
-
-      <OrbitControls
-        enablePan={false}
-        enableZoom={false}
-        autoRotate={false}
-        minPolarAngle={Math.PI / 3.4}
-        maxPolarAngle={Math.PI / 2.1}
-        minAzimuthAngle={-Math.PI / 6}
-        maxAzimuthAngle={Math.PI / 6}
-        target={[0, 0.5, 0]}
       />
     </Canvas>
   );
