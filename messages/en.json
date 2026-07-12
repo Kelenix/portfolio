@@ -11,7 +11,8 @@
   },
   "courses": {
     "catalogTitle": "Courses",
-    "catalogSubtitle": "My training platforms. Each link opens a dedicated platform."
+    "catalogSubtitle": "My training platforms. Each link opens a dedicated platform.",
+    "empty": "Platforms are coming soon."
   },
   "chat": {
     "openLabel": "Open chat",

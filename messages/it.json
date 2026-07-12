@@ -11,7 +11,8 @@
   },
   "courses": {
     "catalogTitle": "Corsi",
-    "catalogSubtitle": "Le mie piattaforme di formazione. Ogni link apre una piattaforma dedicata."
+    "catalogSubtitle": "Le mie piattaforme di formazione. Ogni link apre una piattaforma dedicata.",
+    "empty": "Le piattaforme arrivano presto."
   },
   "chat": {
     "openLabel": "Apri chat",
