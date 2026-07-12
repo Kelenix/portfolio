@@ -8,11 +8,7 @@ import { GraduationCap, Menu, MessageCircle, Rocket, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { OPEN_CHAT_EVENT, UNREAD_CHAT_EVENT } from "@/components/chat/ChatWidget";
 
-interface HeaderProps {
-  locale: string;
-}
-
-export function Header({ locale }: HeaderProps) {
+export function Header() {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);

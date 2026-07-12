@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import { useInViewport } from "./useInViewport";
 import type { SkillNode } from "./skillIcons";
 
 // Canvas chargé côté client uniquement (jamais dans le rendu serveur).
@@ -13,6 +14,7 @@ const SkillsCanvas = dynamic(() => import("./SkillsCanvas"), { ssr: false });
  * pastilles des nœuds les réactivent. Rendu à partir de md (desktop).
  */
 export function SkillsBackground({ skills }: { skills: SkillNode[] }) {
+  const { ref, inView } = useInViewport<HTMLDivElement>();
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
@@ -26,8 +28,8 @@ export function SkillsBackground({ skills }: { skills: SkillNode[] }) {
   if (!enabled) return null;
 
   return (
-    <div className="absolute inset-0 cursor-grab active:cursor-grabbing" aria-hidden>
-      <SkillsCanvas skills={skills} />
+    <div ref={ref} className="absolute inset-0 cursor-grab active:cursor-grabbing" aria-hidden>
+      <SkillsCanvas skills={skills} active={inView} />
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useInViewport } from "./useInViewport";
 import type { DeskLinks } from "./links";
 
 // Le canvas 3D est chargé uniquement côté client, à la demande. Il ne fait
@@ -24,6 +25,7 @@ function DeskSkeleton() {
 
 export function InteractiveDesk({ links }: { links?: DeskLinks }) {
   const t = useTranslations("desk");
+  const { ref, inView } = useInViewport<HTMLDivElement>();
 
   // On ne monte le canvas qu'à partir de md (>=768px) : sur mobile le Hero
   // texte suffit et on évite le coût 3D sur petits appareils.
@@ -47,8 +49,8 @@ export function InteractiveDesk({ links }: { links?: DeskLinks }) {
       >
         {t("hint")}
       </p>
-      <div className="relative h-[520px] w-full">
-        <DeskCanvas links={links} />
+      <div ref={ref} className="relative h-[520px] w-full">
+        <DeskCanvas links={links} active={inView} />
       </div>
     </section>
   );

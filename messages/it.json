@@ -15,7 +15,8 @@
     "viewOn": "Vedi su Chariow",
     "free": "Gratis",
     "all": "Tutti",
-    "empty": "I corsi arrivano presto."
+    "empty": "I corsi arrivano presto.",
+    "error": "Catalogo temporaneamente non disponibile."
   },
   "chat": {
     "openLabel": "Apri chat",

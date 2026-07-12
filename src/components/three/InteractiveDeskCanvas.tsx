@@ -17,7 +17,13 @@ import type { DeskLink, DeskLinks } from "./links";
  * étoile (labels + lignes de rappel) reste lisible et stable. L'utilisateur
  * peut légèrement faire pivoter à la souris.
  */
-export default function InteractiveDeskCanvas({ links }: { links?: DeskLinks }) {
+export default function InteractiveDeskCanvas({
+  links,
+  active = true,
+}: {
+  links?: DeskLinks;
+  active?: boolean;
+}) {
   const { theme } = useTheme();
   const dark = theme === "dark";
   const palette = getPalette(dark);
@@ -44,6 +50,7 @@ export default function InteractiveDeskCanvas({ links }: { links?: DeskLinks }) 
       dpr={[1, 1.5]}
       gl={{ alpha: true, antialias: true }}
       camera={{ position: [0, 2.0, 6.4], fov: 46 }}
+      frameloop={active ? "always" : "never"}
       onCreated={({ camera }) => camera.lookAt(0, 0.4, 0)}
     >
       {/* Éclairage adapté au thème (pas d'HDR externe → self-contained) */}

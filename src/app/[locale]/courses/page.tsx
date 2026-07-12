@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import Script from "next/script";
 import type { AppLocale } from "@/lib/seo";
 import { getChariowProducts } from "@/lib/chariow";
 import { type FormationCard } from "@/components/sections/FormationsGrid";
@@ -26,7 +27,7 @@ export default async function CoursesPage() {
   const locale = (await getLocale()) as AppLocale;
   const t = await getTranslations("courses");
 
-  const products = await getChariowProducts();
+  const { products, error } = await getChariowProducts();
   const labels = LABELS[locale] ?? LABELS.fr;
   const order = CATEGORY_ORDER as readonly string[];
 
@@ -50,8 +51,42 @@ export default async function CoursesPage() {
     .filter((k) => present.has(k))
     .map((k) => ({ key: k, label: labels[k] }));
 
+  // Données structurées : liste de produits avec offres (rich results Google).
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: products.map((p, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "Product",
+        name: p.name,
+        ...(p.thumbnail ? { image: p.thumbnail } : {}),
+        url: p.url,
+        ...(p.priceValue != null && p.currency
+          ? {
+              offers: {
+                "@type": "Offer",
+                price: p.priceValue,
+                priceCurrency: p.currency,
+                availability: "https://schema.org/InStock",
+                url: p.url,
+              },
+            }
+          : {}),
+      },
+    })),
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-6 py-16">
+      {items.length > 0 && (
+        <Script
+          id="courses-jsonld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <h1 className="mb-3 font-mono text-2xl font-bold" style={{ color: "var(--foreground)" }}>
         {t("catalogTitle")}
       </h1>
@@ -69,7 +104,7 @@ export default async function CoursesPage() {
         />
       ) : (
         <p className="font-mono text-sm" style={{ color: "var(--muted-foreground)" }}>
-          {t("empty")}
+          {error ? t("error") : t("empty")}
         </p>
       )}
     </div>

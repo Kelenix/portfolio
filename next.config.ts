@@ -6,7 +6,11 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "**" },
+      // Stockage Supabase (photos de profil, images projets/apps, blog…)
+      { protocol: "https", hostname: "*.supabase.co" },
+      // CDN Chariow (visuels des formations/produits)
+      { protocol: "https", hostname: "images.chariowcdn.com" },
+      { protocol: "https", hostname: "assets.chariowcdn.com" },
     ],
   },
 };

@@ -15,7 +15,8 @@
     "viewOn": "View on Chariow",
     "free": "Free",
     "all": "All",
-    "empty": "Courses are coming soon."
+    "empty": "Courses are coming soon.",
+    "error": "Catalog temporarily unavailable."
   },
   "chat": {
     "openLabel": "Open chat",

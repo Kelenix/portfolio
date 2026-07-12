@@ -15,7 +15,8 @@
     "viewOn": "Voir sur Chariow",
     "free": "Gratuit",
     "all": "Tout",
-    "empty": "Les formations arrivent bientôt."
+    "empty": "Les formations arrivent bientôt.",
+    "error": "Catalogue momentanément indisponible."
   },
   "chat": {
     "openLabel": "Ouvrir le chat",

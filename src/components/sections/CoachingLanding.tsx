@@ -132,7 +132,7 @@ export function CoachingLanding() {
                 >
                   site web
                 </span>{" "}
-                avec l'IA en 2 semaines
+                avec l’IA en 2 semaines
               </h1>
 
               <p
@@ -140,7 +140,7 @@ export function CoachingLanding() {
                 style={{ color: "var(--muted-foreground)" }}
               >
                 Un accompagnement pas à pas pour transformer ton idée en un vrai
-                site web en ligne — grâce à l'intelligence artificielle, même si
+                site web en ligne — grâce à l’intelligence artificielle, même si
                 tu débutes de zéro.
               </p>
 
@@ -409,7 +409,7 @@ export function CoachingLanding() {
               className="mt-1 max-w-xs text-xs leading-relaxed"
               style={{ color: "var(--muted-foreground)" }}
             >
-              Développeur & créateur. Je t'accompagne au quotidien dans le
+              Développeur & créateur. Je t’accompagne au quotidien dans le
               groupe pour que tu ne restes jamais bloqué.
             </p>
           </div>
@@ -444,13 +444,13 @@ export function CoachingLanding() {
             className="mx-auto max-w-2xl text-2xl font-bold leading-tight md:text-4xl"
             style={{ color: "var(--foreground)" }}
           >
-            Prêt à lancer ton site web avec l'IA ?
+            Prêt à lancer ton site web avec l’IA ?
           </h2>
           <p
             className="mx-auto mt-4 max-w-xl text-sm leading-relaxed md:text-base"
             style={{ color: "var(--muted-foreground)" }}
           >
-            Rejoins le groupe WhatsApp privé du coaching. C'est là que tout se
+            Rejoins le groupe WhatsApp privé du coaching. C’est là que tout se
             passe : accompagnement, ressources et lancement de ton projet.
           </p>
           <div className="mt-8 flex flex-col items-center gap-4">

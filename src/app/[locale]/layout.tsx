@@ -155,7 +155,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           className="flex min-h-screen flex-col"
           style={{ background: "var(--background)", color: "var(--foreground)" }}
         >
-          <Header locale={locale} />
+          <Header />
           <main className="flex-1">{children}</main>
           <Footer />
           <ChatWidget avatarUrl={chatProfile.avatarUrl} adminName={chatProfile.name} />

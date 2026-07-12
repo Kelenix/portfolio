@@ -10,7 +10,13 @@ import type { SkillNode } from "./skillIcons";
  * Canvas de la constellation de compétences. Non éclairé, monochrome. Chargé
  * dynamiquement (ssr:false) par SkillsBackground.
  */
-export default function SkillsCanvas({ skills }: { skills: SkillNode[] }) {
+export default function SkillsCanvas({
+  skills,
+  active = true,
+}: {
+  skills: SkillNode[];
+  active?: boolean;
+}) {
   const { theme } = useTheme();
   const dark = theme === "dark";
 
@@ -19,6 +25,7 @@ export default function SkillsCanvas({ skills }: { skills: SkillNode[] }) {
       dpr={[1, 1.5]}
       gl={{ alpha: true, antialias: true }}
       camera={{ position: [0, 2.1, 6.4], fov: 50 }}
+      frameloop={active ? "always" : "never"}
     >
       <NetworkSphere
         skills={skills}
