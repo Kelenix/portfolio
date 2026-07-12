@@ -55,7 +55,9 @@ export async function getChariowProducts(): Promise<ChariowProduct[]> {
     if (!res.ok) return [];
 
     const json = await res.json();
-    const items: RawProduct[] = json?.data?.data ?? [];
+    // L'API renvoie { data: [...], pagination }. On tolère aussi { data: { data: [...] } }.
+    const raw = json?.data;
+    const items: RawProduct[] = Array.isArray(raw) ? raw : (raw?.data ?? []);
 
     return items.map((p) => {
       const cur = p.pricing?.current_price;
