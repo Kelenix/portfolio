@@ -174,20 +174,6 @@ model MobileApp {
   updatedAt     DateTime @updatedAt
 }
 
-model Platform {
-  id        String   @id @default(cuid())
-  title     String
-  descFr    String   @default("")
-  descEn    String   @default("")
-  descIt    String   @default("")
-  url       String?
-  badge     String?
-  order     Int      @default(0)
-  published Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model FooterLink {
   id        String   @id @default(cuid())
   labelFr   String

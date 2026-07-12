@@ -11,8 +11,10 @@
   },
   "courses": {
     "catalogTitle": "Cours",
-    "catalogSubtitle": "Mes plateformes de formation. Chaque lien ouvre une plateforme dédiée.",
-    "empty": "Les plateformes arrivent bientôt."
+    "catalogSubtitle": "Mes formations et eBooks pour développeurs. Accès immédiat, paiement sécurisé via Chariow.",
+    "viewOn": "Voir sur Chariow",
+    "free": "Gratuit",
+    "empty": "Les formations arrivent bientôt."
   },
   "chat": {
     "openLabel": "Ouvrir le chat",

@@ -1,10 +1,17 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { prisma } from "@/lib/db";
-import { pickLocaleField, type AppLocale } from "@/lib/seo";
-import { CoursesGrid, type CoursePlatform } from "@/components/sections/CoursesGrid";
+import type { AppLocale } from "@/lib/seo";
+import { getChariowProducts } from "@/lib/chariow";
+import { FormationsGrid, type FormationCard } from "@/components/sections/FormationsGrid";
 import type { Metadata } from "next";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 600;
+
+// Libellé du type de produit selon la langue.
+const TYPE_LABELS: Record<AppLocale, Record<string, string>> = {
+  fr: { downloadable: "eBook", course: "Cours", coaching: "Coaching", service: "Service", license: "Licence", bundle: "Pack" },
+  en: { downloadable: "eBook", course: "Course", coaching: "Coaching", service: "Service", license: "License", bundle: "Bundle" },
+  it: { downloadable: "eBook", course: "Corso", coaching: "Coaching", service: "Servizio", license: "Licenza", bundle: "Pacchetto" },
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("courses");
@@ -15,17 +22,17 @@ export default async function CoursesPage() {
   const locale = (await getLocale()) as AppLocale;
   const t = await getTranslations("courses");
 
-  // Résilient : liste vide si la table n'existe pas encore ou DB injoignable.
-  const platforms = await prisma.platform
-    .findMany({ where: { published: true }, orderBy: { order: "asc" } })
-    .catch(() => []);
+  const products = await getChariowProducts();
+  const labels = TYPE_LABELS[locale] ?? TYPE_LABELS.fr;
 
-  const items: CoursePlatform[] = platforms.map((p) => ({
-    href: p.url,
-    title: p.title,
-    desc: pickLocaleField(locale, { fr: p.descFr, en: p.descEn, it: p.descIt }),
-    badge: p.badge ?? undefined,
-    disabled: !p.url,
+  const items: FormationCard[] = products.map((p) => ({
+    name: p.name,
+    thumbnail: p.thumbnail,
+    price: p.price,
+    original: p.original,
+    isFree: p.isFree,
+    badge: labels[p.type] ?? null,
+    url: p.url,
   }));
 
   return (
@@ -38,7 +45,7 @@ export default async function CoursesPage() {
       </p>
 
       {items.length > 0 ? (
-        <CoursesGrid items={items} />
+        <FormationsGrid items={items} cta={t("viewOn")} freeLabel={t("free")} />
       ) : (
         <p className="font-mono text-sm" style={{ color: "var(--muted-foreground)" }}>
           {t("empty")}

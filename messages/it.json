@@ -11,8 +11,10 @@
   },
   "courses": {
     "catalogTitle": "Corsi",
-    "catalogSubtitle": "Le mie piattaforme di formazione. Ogni link apre una piattaforma dedicata.",
-    "empty": "Le piattaforme arrivano presto."
+    "catalogSubtitle": "I miei corsi ed eBook per sviluppatori. Accesso immediato, pagamento sicuro via Chariow.",
+    "viewOn": "Vedi su Chariow",
+    "free": "Gratis",
+    "empty": "I corsi arrivano presto."
   },
   "chat": {
     "openLabel": "Apri chat",

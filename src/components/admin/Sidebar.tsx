@@ -18,7 +18,6 @@ import {
   ShieldCheck,
   MessageCircle,
   Bot,
-  GraduationCap,
 } from "lucide-react";
 
 const navItems = [
@@ -27,7 +26,6 @@ const navItems = [
   { href: "/admin/mobile-apps", label: "Apps mobiles", icon: Smartphone },
   { href: "/admin/accomplishments", label: "Accomplissements", icon: Star },
   { href: "/admin/skills", label: "Tech Stack", icon: Code2 },
-  { href: "/admin/platforms", label: "Plateformes", icon: GraduationCap },
   { href: "/admin/blog", label: "Blog", icon: BookOpen },
   { href: "/admin/social", label: "Réseaux", icon: Share2 },
   { href: "/admin/footer", label: "Footer", icon: PanelBottom },
