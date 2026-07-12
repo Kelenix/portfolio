@@ -11,6 +11,8 @@ export interface FormationCard {
   original: string | null;
   isFree: boolean;
   badge: string | null;
+  /** Clé de catégorie (type Chariow) pour le filtrage. */
+  category: string;
   url: string;
 }
 
