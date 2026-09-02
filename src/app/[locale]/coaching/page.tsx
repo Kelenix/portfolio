@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { CoachingLanding } from "@/components/sections/CoachingLanding";
 import { getLocale } from "next-intl/server";
 import {
   type AppLocale,
@@ -9,9 +8,9 @@ import {
 
 export const dynamic = "force-dynamic";
 
-const TITLE = "Coaching : Lance ton site web avec l'IA en 2 semaines";
+const TITLE = "Docker + IA · De Zéro à Pro";
 const DESCRIPTION =
-  "Un accompagnement pas à pas pour transformer ton idée en un vrai site web en ligne grâce à l'IA — en 2 semaines, même en partant de zéro.";
+  "Formation Docker + IA : de zéro à pro. Maîtrise la conteneurisation et l'IA appliquée, étape par étape.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as AppLocale;
@@ -25,11 +24,17 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: TITLE,
       description: DESCRIPTION,
-      images: ["/coaching/cover.png"],
     },
   };
 }
 
 export default function CoachingPage() {
-  return <CoachingLanding />;
+  return (
+    <iframe
+      src="/coaching/docker-ia.html"
+      title={TITLE}
+      className="block w-full border-0"
+      style={{ height: "calc(100dvh - 64px)" }}
+    />
+  );
 }
